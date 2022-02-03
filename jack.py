@@ -128,39 +128,6 @@ async def on_message(message):
 
     if message.content.lower() in commands: processing.pop(f"{message.channel.id}")
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-client.run("OTM4NDYxNTEzODM0OTYyOTQ0.YfqoZA.7j_L59lFtTIa7YCpysN5e3rO5B0")
+with open("./token.txt", "r", encoding="utf8") as f:
+    token = f.read()
+client.run(token)
