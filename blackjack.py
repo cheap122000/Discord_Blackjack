@@ -8,8 +8,8 @@ import os, shutil
 
 client = discord.Client()
 
-if not os.path.exists("./blackjack.db3"):
-    shutil.copy("./blackjack2.db3", "./blackjack.db3")
+if not os.path.exists("./db_bj.db3"):
+    shutil.copy("./db_bj2.db3", "./db_bj.db3")
 
 with open("./token.txt", "r", encoding="utf8") as f:
     token = f.read()
@@ -30,6 +30,26 @@ processing = {}
 @client.event
 async def on_ready():
     print(f"Logged in as {client.user}")
+
+@client.event
+async def on_message(message):
+    if message.author == client.user:
+        return
+
+    if message.content.find("<@!938461513834962944>") != -1:
+        await message.channel.send(f"<@!{message.author.id}> 衝啥? 輸贏???")
+        return
+
+    if message.content.lower() in commands:
+        p_time = processing.get(f"{message.channel.id}")
+        if p_time:
+            if int(time.time()) - p_time < 10:
+                return
+        processing[f"{message.channel.id}"] = int(time.time())
+    else:
+        pass
+
+    if message.content.lower() in commands: processing.pop(f"{message.channel.id}")
 
 async def my_background_task():
     await client.wait_until_ready()

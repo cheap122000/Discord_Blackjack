@@ -1,9 +1,13 @@
 import sqlite3
 
 class DB:
-    def __init__(self):
-        self.conn = sqlite3.connect("./card.db3", check_same_thread=False)
-        self.c = self.conn.cursor()
+    def __init__(self, db_name=None):
+        if db_name:
+            self.conn = sqlite3.connect(db_name, check_same_thread=False)
+            self.c = self.conn.cursor()
+        else:
+            self.conn = sqlite3.connect("./card.db3", check_same_thread=False)
+            self.c = self.conn.cursor()
 
     def query_data(self, instruction):
         rows = self.c.execute(instruction).fetchall()
