@@ -4,9 +4,13 @@ import json
 import random
 import time
 from db import DB
-import asyncio
+import os
+import shutil
 
 client = discord.Client()
+
+if not os.path.exists("./card.db3"):
+    shutil.copy("./card2.db3", "./card.db3")
 
 with open("./token.txt", "r", encoding="utf8") as f:
     token = f.read()
