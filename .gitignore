@@ -1,2 +1,3 @@
 *.db3
 token.txt
+__pycache__*
