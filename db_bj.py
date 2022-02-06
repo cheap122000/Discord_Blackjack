@@ -10,6 +10,17 @@ dealer_init = {}
 dealer_init["step"] = 0
 empty_dict = {}
 
+deck_of_card = {}
+for i in range(52):
+    temp = {}
+    temp["number"] = i % 13
+    temp["point"] = 10 if temp["number"] > 8 else 11 if temp["number"] == 0 else temp["number"] + 1
+    temp["number"] = "A" if temp["number"] == 0 else "J" if temp["number"] == 10 else "Q" if temp["number"] == 11 else "K" if temp["number"] == 12 else str(temp["number"] + 1)
+    temp["suit"] = "spades" if i < 13 else "hearts" if i < 26 else "diamonds" if i < 39 else "clubs"
+    deck_of_card[i] = temp
+
+new_deck = [i for i in range(52)]
+
 class DB:
     def __init__(self):
         self.conn = sqlite3.connect("./db_bj.db3", check_same_thread=False)
@@ -44,11 +55,14 @@ class DB:
 
         if len(rows) > 0:
             dealer, last_time = json.loads(rows[0][4]), int(rows[0][5])
+            if dealer["step"] == -1:
+                self.operate_db(f"UPDATE [games] SET [cards]='{json.dumps(new_deck)}', [records]='{json.dumps(empty_dict)}', [dealer]='{json.dumps(dealer_init)}', [time]='{int(time.time())}' WHERE [channel_id]='{channel_id}'")
+                return 0, 60
             time_left = 60 - (int(time.time()) - last_time)
             time_left = 1 if time_left < 1 else time_left
             return dealer["step"], time_left
         else:
-            self.operate_db(f"INSERT INTO [games] ([channel_id], [cards], [records], [dealer], [time]) VALUES ('{channel_id}', '[]', '{json.dumps(empty_dict)}', '{json.dumps(dealer_init)}', '{int(time.time())}')")
+            self.operate_db(f"INSERT INTO [games] ([channel_id], [cards], [records], [dealer], [time]) VALUES ('{channel_id}', '{json.dumps(new_deck)}', '{json.dumps(empty_dict)}', '{json.dumps(dealer_init)}', '{int(time.time())}')")
             return 0, 60
     
     def check_time(self):

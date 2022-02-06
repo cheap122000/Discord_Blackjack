@@ -13,17 +13,7 @@ if not os.path.exists("./db_bj.db3"):
 
 with open("./token.txt", "r", encoding="utf8") as f:
     token = f.read()
-
-deck_of_card = {}
-for i in range(52):
-    temp = {}
-    temp["number"] = i % 13
-    temp["point"] = 10 if temp["number"] > 8 else 11 if temp["number"] == 0 else temp["number"] + 1
-    temp["number"] = "A" if temp["number"] == 0 else "J" if temp["number"] == 10 else "Q" if temp["number"] == 11 else "K" if temp["number"] == 12 else str(temp["number"] + 1)
-    temp["suit"] = "spades" if i < 13 else "hearts" if i < 26 else "diamonds" if i < 39 else "clubs"
-    deck_of_card[i] = temp
-
-new_deck = [i for i in range(52)]
+    
 commands = ["!start", "!hit", "!surrender", "!reset", "!daily"]
 processing_channel = {}
 processing_user = {}
@@ -88,9 +78,14 @@ async def on_message(message):
             await message.channel.send("A game has started! Please wait for the next game.")
         else:
             await message.channel.send(f"A game is started! Use command \"!join\" to join this game. A game will start in {time_left} second(s).")
+            client.loop.create_task(game_task(message.channel))
         db.close()
 
     if message.content.lower().startswith(tuple(commands)): delete_from_processing(message)
+
+async def game_task(channel):
+    print(f"HI {channel.id}")
+
 
 async def my_background_task():
     db = DB()
