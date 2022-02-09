@@ -14,7 +14,7 @@ if not os.path.exists("./db_bj.db3"):
 with open("./token.txt", "r", encoding="utf8") as f:
     token = f.read()
     
-commands = ["!start", "!hit", "!surrender", "!reset", "!daily"]
+commands = ["bj!start", "bj!hit", "bj!surrender", "bj!reset", "bj!daily"]
 processing_channel = {}
 processing_user = {}
 
@@ -61,7 +61,7 @@ async def on_message(message):
             await message.channel.send("Please wait for the last command finish.")
             return
 
-    if message.content.lower().startswith("!daily"):
+    if message.content.lower().startswith("bj!daily"):
         db = DB()
         success, balance = db.get_daily(message.author.id)
         db.close()
@@ -71,7 +71,7 @@ async def on_message(message):
         else:
             await message.channel.send(f"<@!{message.author.id}> had obtained daily Nicoins today, now has {balance} Nicoins.")
 
-    if message.content.lower().startswith("!start"):
+    if message.content.lower().startswith("bj!start"):
         db = DB()
         game_step, time_left = db.start_a_game(message.channel.id)
         if game_step:
