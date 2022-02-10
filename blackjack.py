@@ -1,6 +1,3 @@
-from dis import disco
-from gc import garbage
-from turtle import color
 import discord
 import json
 import random
