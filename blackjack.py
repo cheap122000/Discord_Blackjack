@@ -159,6 +159,7 @@ async def game_task(channel, m):
 
     while True:
         if game_records[channel_id]["step"] == 0:
+            # TODO add players' field
             await step0(game_records[channel_id])
         elif game_records[channel_id]["step"] == 1:
             # TODO
