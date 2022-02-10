@@ -3,3 +3,4 @@ db_bj.db3
 token.txt
 __pycache__*
 test*
+venv*
