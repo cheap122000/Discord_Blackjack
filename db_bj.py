@@ -49,21 +49,38 @@ class DB:
         else:
             self.operate_db(f"INSERT INTO [users] ([dc_id], [currency], [daily]) VALUES ('{dc_id}', '1000', '{datetime.datetime.now().strftime('%Y%m%d')}')")
             return True, 1000
+    
+    def query_user_balance(self, dc_id):
+        rows = self.query_data(f"SELECT * FROM [users] WHERE [dc_id]='{dc_id}'")
 
-    def start_a_game(self, channel_id):
-        rows = self.query_data(f"SELECT * FROM [games] WHERE [channel_id]='{channel_id}'")
-
-        if len(rows) > 0:
-            dealer, last_time = json.loads(rows[0][4]), int(rows[0][5])
-            if dealer["step"] == -1:
-                self.operate_db(f"UPDATE [games] SET [cards]='{json.dumps(new_deck)}', [records]='{json.dumps(empty_dict)}', [dealer]='{json.dumps(dealer_init)}', [time]='{int(time.time())}' WHERE [channel_id]='{channel_id}'")
-                return 0, 60
-            time_left = 60 - (int(time.time()) - last_time)
-            time_left = 1 if time_left < 1 else time_left
-            return dealer["step"], time_left
+        if len(rows):
+            balance = int(rows[0][2])
+            return int(balance)
         else:
-            self.operate_db(f"INSERT INTO [games] ([channel_id], [cards], [records], [dealer], [time]) VALUES ('{channel_id}', '{json.dumps(new_deck)}', '{json.dumps(empty_dict)}', '{json.dumps(dealer_init)}', '{int(time.time())}')")
-            return 0, 60
+            return 0
+
+    # def start_a_game(self, channel_id):
+    #     rows = self.query_data(f"SELECT * FROM [games] WHERE [channel_id]='{channel_id}'")
+
+    #     if len(rows) > 0:
+    #         dealer, last_time = json.loads(rows[0][4]), int(rows[0][5])
+    #         if dealer["step"] == -1:
+    #             self.operate_db(f"UPDATE [games] SET [cards]='{json.dumps(new_deck)}', [records]='{json.dumps(empty_dict)}', [dealer]='{json.dumps(dealer_init)}', [time]='{int(time.time())}' WHERE [channel_id]='{channel_id}'")
+    #             return 0, 60
+    #         time_left = 60 - (int(time.time()) - last_time)
+    #         time_left = 1 if time_left < 1 else time_left
+    #         return dealer["step"], time_left
+    #     else:
+    #         self.operate_db(f"INSERT INTO [games] ([channel_id], [cards], [records], [dealer], [time]) VALUES ('{channel_id}', '{json.dumps(new_deck)}', '{json.dumps(empty_dict)}', '{json.dumps(dealer_init)}', '{int(time.time())}')")
+    #         return 0, 60
+    # def save_game(self, channel_id, record):
+    #     rows = self.query_data(f"SELECT * FROM [games] WHERE [channel_id]='{channel_id}'")
+
+    #     if len(rows) > 0:
+    #         self.operate_db(f"UPDATE [games] SET [cards]='{json.dumps(new_deck)}', [records]='{json.dumps(record)}', [dealer]='{json.dumps(dealer_init)}', [time]='{int(time.time())}' WHERE [channel_id]='{channel_id}'")
+    #     else:
+    #         self.operate_db(f"INSERT INTO [games] ([channel_id], [cards], [records], [dealer], [time]) VALUES ('{channel_id}', '{json.dumps(new_deck)}', '{json.dumps(empty_dict)}', '{json.dumps(dealer_init)}', '{int(time.time())}')")
+    #         return 0, 60
     
     def check_time(self):
         query_time = int(time.time()) - 60
