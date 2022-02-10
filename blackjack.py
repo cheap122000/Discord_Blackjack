@@ -33,6 +33,7 @@ processing_channel = {}
 processing_user = {}
 
 game_records = {}
+turn_count = 60
 
 def store_to_processing(message):
     processing_channel[str(message.channel.id)] = int(time.time())
@@ -107,7 +108,12 @@ async def on_message(message:discord.Message):
         if game_records.get(str(message.channel.id)):
             await message.channel.send("A game has started! Please wait for the next game.")
         else:
-            m = await message.channel.send(f"A game is started! Use command \"!join\" to join this game. The game will start in 60 second(s).")
+            embed = discord.Embed()
+            embed.type = "rich"
+            embed.set_author(name="A game is started! Use command \"!join\" to join this game. ")
+            embed.set_footer(text=f"The game will start in 60 second(s).")
+
+            m = await message.channel.send(embed=embed)
             client.loop.create_task(game_task(message.channel, m))
         db.close()
 
@@ -137,13 +143,7 @@ async def on_message(message:discord.Message):
             if len(game_records[channel_id]["players"]) < 6:
                 game_records[channel_id]["players"].append({"user_id": message.author.id, "user_name": message.author.display_name, "bet_amount": bet_amount})
 
-                time_left = 60 - (int(time.time()) - game_records[channel_id]['start_time'])
-                time_left = 0 if time_left < 0 else time_left
-                ret = f"A game is started! Use command \"!join\" to join this game. The game will start in {time_left} second(s)."
-                ret += "\nPlayers:"
-                for item in game_records[channel_id]["players"]:
-                    ret += f"\n{item['user_name']}: {item['bet_amount']} :money_with_wings:"
-                await game_records[channel_id]["message"].edit(content=ret)
+                await step0(game_records[channel_id])
             else:
                 await message.channel.send("The max limit for a game is 6 players. Please wait for the next game.")
 
@@ -159,7 +159,7 @@ async def game_task(channel, m):
 
     while True:
         if game_records[channel_id]["step"] == 0:
-            await m.edit(content=create_game_message(game_records[channel_id]))
+            await step0(game_records[channel_id])
         elif game_records[channel_id]["step"] == 1:
             # TODO
             pass
@@ -175,21 +175,24 @@ async def game_task(channel, m):
     
     # db.close()
 
-def create_game_message(record):
-    time_left = 10 - (int(time.time()) - record['start_time'])
+async def step0(record):
+    time_left = turn_count - (int(time.time()) - record['start_time'])
     time_left = 0 if time_left < 0 else time_left
-    if record["step"] == 0:
-        ret = f"A game is started! Use command \"!join\" to join this game. The game will start in {time_left} second(s)."
-        if len(record["players"]):
-            ret += "\nPlayers:"
-            for item in record["players"]:
-                ret += f"\n{item['user_name']}: {item['bet_amount']} :money_with_wings:"
-    elif record["step"] == 1:
-        pass
+    embed = discord.Embed()
+    embed.type = "rich"
+    embed.set_author(name="A game is started! Use command \"!join\" to join this game. ")
+    embed.set_footer(text=f"The game will start in {time_left} second(s).")
+    ret = f"A game is started! Use command \"!join\" to join this game. The game will start in {time_left} second(s)."
+    if len(record["players"]):
+        ret += "\nPlayers:"
+        for item in record["players"]:
+            ret += f"\n{item['user_name']}: {item['bet_amount']} :money_with_wings:"
 
     if time_left <= 0:
         record["step"] += 1
-    return ret
+
+    # await record["message"].edit(content=ret)
+    await record["message"].edit(embed=embed, content=None)
 
 
 def hit_a_card(cards: list):
