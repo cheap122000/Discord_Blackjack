@@ -145,6 +145,14 @@ async def on_message(message:discord.Message):
                 await message.channel.send("The max limit for a game is 6 players. Please wait for the next game.")
         else:
             await message.reply(f"Use command bj!start to create a game first.")
+
+    if message.content.lower().startswith("bj!p"):
+        db = DB()
+        embed = discord.Embed()
+        embed.set_author(name=f"{message.author.display_name} has {db.query_user_balance(message.author.id)} :coin:", icon_url=message.author.avatar_url)
+        embed.colour = discord.Colour.green()
+        db.close()
+        await message.channel.send(embed=embed)
     
     if message.content.lower().startswith("bj!hit"):
         channel_id = str(message.channel.id)
