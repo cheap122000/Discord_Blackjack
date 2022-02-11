@@ -59,6 +59,31 @@ class DB:
         else:
             return 0
 
+    def bet(self, dc_id, bet_amount):
+        rows = self.query_data(f"SELECT * FROM [users] WHERE [dc_id]='{dc_id}'")
+
+        if len(rows):
+            balance = int(rows[0][2])
+            if bet_amount > int(balance):
+                return False, balance
+            else:
+                balance -= bet_amount
+                self.operate_db(f"UPDATE [users] SET [currency]='{balance}' WHERE [dc_id]='{dc_id}'")
+                return True, balance
+        else:
+            return False, 0
+
+    def get_balance(self, dc_id, bet_amount):
+        rows = self.query_data(f"SELECT * FROM [users] WHERE [dc_id]='{dc_id}'")
+
+        if len(rows):
+            balance = int(rows[0][2])
+            balance += bet_amount
+            self.operate_db(f"UPDATE [users] SET [currency]='{balance}' WHERE [dc_id]='{dc_id}'")
+            return balance
+        else:
+            return 0
+
     # def start_a_game(self, channel_id):
     #     rows = self.query_data(f"SELECT * FROM [games] WHERE [channel_id]='{channel_id}'")
 
