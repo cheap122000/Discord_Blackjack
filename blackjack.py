@@ -149,7 +149,8 @@ async def on_message(message:discord.Message):
     if message.content.lower().startswith("bj!p"):
         db = DB()
         embed = discord.Embed()
-        embed.set_author(name=f"{message.author.display_name} has {db.query_user_balance(message.author.id)} :coin:", icon_url=message.author.avatar_url)
+        embed.type = "rich"
+        embed.set_author(name=f"{message.author.display_name} has {db.query_user_balance(message.author.id)} Nicoins.", icon_url=message.author.avatar_url)
         embed.colour = discord.Colour.green()
         db.close()
         await message.channel.send(embed=embed)
