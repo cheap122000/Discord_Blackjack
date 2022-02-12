@@ -1,4 +1,3 @@
-from aiohttp import content_disposition_filename
 import discord
 import json
 import random
@@ -294,6 +293,10 @@ async def step1(record):
     embed.set_footer(text=f"The game is playing.")
     embed.add_field(name=":point_right: Dealer", value=f"cards: {dealer_cards}", inline=False)
 
+    if n_players == 0:
+        record["step"] = 5
+        return
+        
     for i, item in enumerate(record["players"]):
         embed.add_field(name=item["user_name"], value=f"chips: {item['bet_amount']} :coin:\ncards: ", inline=False)
     await record["message"].edit(embed=embed, content=content)
