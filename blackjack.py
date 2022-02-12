@@ -538,9 +538,9 @@ async def step4(record):
             elif dealer_result == "Busted":
                 balance = p["bet_amount"]
             else:
-                # if int(result) == int(dealer_result):
-                #     balance = 0
-                if int(result) > int(dealer_result):
+                if int(result) == int(dealer_result):
+                    balance = 0
+                elif int(result) > int(dealer_result):
                     balance = p["bet_amount"]
                 else:
                     balance = p["bet_amount"] * -1
