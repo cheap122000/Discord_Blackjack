@@ -63,11 +63,46 @@ async def on_message(message:discord.Message):
             await message.reply("Error! Please wait for the last command finish.")
             return
 
-    if message.content.lower() == "!test":
+    if message.content.lower().startswith("!gamble"):
+        channel_id = str(message.channel.id)
+        try:
+            m_s = message.content.lower().split(" ")
+            if len(m_s) != 2:
+                await message.channel.send("!gamble needs 1 parameter.")
+                delete_from_processing(message)
+                return
+            bet_amount = int(m_s[1])
+            if bet_amount < 1:
+                await message.channel.send("Your bet amount must be at least 1 Nicoins.")
+                delete_from_processing(message)
+                return
+        except:
+            await message.channel.send("Your bet amount must be a positive number")
+            delete_from_processing(message)
+            return
+
         embed = discord.Embed()
         embed.type = "rich"
-        embed.set_footer(text="DarkKnight_NVD#8388\uff0e\u4f7f\u7528 z!help [\u6307\u4ee4\u540d\u7a31] \u7372\u5f97\u66f4\u8a73\u7d30\u7684\u8aaa\u660e")
-        await message.channel.send(embed=embed)
+
+        db = DB()
+        success, balance = db.bet(message.author.id, bet_amount)
+        if success:
+            num = random.randint(1, 100)
+            if num <= 60:
+                embed.colour = discord.Colour.red()
+                embed.set_author(name=f"{message.author.display_name} rolled {num}, lost {bet_amount} Nicoins. Now have {balance} Nicoins", icon_url=message.author.avatar_url)
+            elif num <= 97:
+                balance = db.get_balance(message.author.id, bet_amount*2)
+                embed.colour = discord.Colour.green()
+                embed.set_author(name=f"{message.author.display_name} rolled {num}, won {bet_amount} Nicoins. Now have {balance} Nicoins", icon_url=message.author.avatar_url)
+            else:
+                balance = db.get_balance(message.author.id, bet_amount*3)
+                embed.colour = discord.Colour.gold()
+                embed.set_author(name=f"{message.author.display_name} rolled {num}, won {bet_amount*2} Nicoins. Now have {balance} Nicoins", icon_url=message.author.avatar_url)
+            await message.reply(embed=embed)
+        else:
+            await message.reply(content=f"You don't have enough Nicoins. Your balance: {balance} :coin:")
+        db.close()
 
     if message.content.lower().startswith("bj!daily"):
         db = DB()
