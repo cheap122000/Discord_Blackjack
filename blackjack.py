@@ -81,7 +81,7 @@ async def on_message(message:discord.Message):
                 await message.channel.send("You are not CodingMaster = =")
                 delete_from_processing(message)
                 return
-            dc_id = m_s[1].replace("<@!").replace(">")
+            dc_id = m_s[1].replace("<@!", "").replace(">", "")
             give_amount = int(m_s[2])
         except:
             await message.channel.send("Your bet amount must be a positive number")
@@ -538,9 +538,9 @@ async def step4(record):
             elif dealer_result == "Busted":
                 balance = p["bet_amount"]
             else:
-                if int(result) == int(dealer_result):
-                    balance = 0
-                elif int(result) > int(dealer_result):
+                # if int(result) == int(dealer_result):
+                #     balance = 0
+                if int(result) > int(dealer_result):
                     balance = p["bet_amount"]
                 else:
                     balance = p["bet_amount"] * -1
