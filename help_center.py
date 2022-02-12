@@ -49,7 +49,7 @@ class helpCenter():
                 msg = "Create a BlackJack game in this channel. The game will start in 30 seconds.\n"
                 msg += "During this period, you can use `bj!join <Nicoins>` to join the game.\n"
                 msg += "After the game starting, Dealer will get 1 card, and each player will get 2 cards.\n"
-                msg += "**A** for 1 or 11 points, **J, Q, K** for 10 points, 2~9 for 2~9 points\n"
+                msg += "**A** for 1 or 11 points, **J, Q, K** for 10 points, 2~10 for 2~10 points\n"
                 msg += "Use `bj!hit` to hit a card, `bj!double` to double your chips, `bj!stand` to stand.\n"
                 msg += "When players finish their rounds, Dealer will draw a card if his points are less than 17.\n"
                 msg += "**BlackJack**: You got a **A** and a 10-point card.\n"
