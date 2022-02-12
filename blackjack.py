@@ -300,7 +300,7 @@ async def game_task(channel, m):
     if channel_id in game_records:
         await channel.send("A game has started! Please wait for the next game.")
         return
-    game_records[channel_id] = {"players": [], "turn": -1, "hit":False, "dealer": {"cards": []}, "message": m, "start_time": int(time.time()), "step": 0, "record": {}, "cards": new_deck}
+    game_records[channel_id] = {"players": [], "turn": -1, "hit":False, "dealer": {"cards": []}, "message": m, "start_time": int(time.time()), "step": 0, "record": {}, "cards": [i for i in range(52)]}
 
     while True:
         if game_records[channel_id]["step"] == 0:
