@@ -69,6 +69,31 @@ async def on_message(message:discord.Message):
             await message.reply("Error! Please wait for the last command finish.")
             return
 
+    if message.content.lower().startswith("bj!op"):
+        channel_id = str(message.channel.id)
+        try:
+            m_s = message.content.lower().split(" ")
+            if len(m_s) != 3:
+                await message.channel.send("!gamble needs 2 parameter.")
+                delete_from_processing(message)
+                return
+            if str(message.author.id) != "355354569049505792":
+                await message.channel.send("You are not CodingMaster = =")
+                delete_from_processing(message)
+                return
+            dc_id = m_s[1].replace("<@!").replace(">")
+            give_amount = int(m_s[2])
+        except:
+            await message.channel.send("Your bet amount must be a positive number")
+            delete_from_processing(message)
+            return
+
+        db = DB()
+        balance = db.get_balance(dc_id, give_amount)
+        db.close()
+        
+        await message.channel.send(f"<@!{dc_id}> now have {balance} :coin:")
+
     if message.content.lower().startswith("bj!gamble"):
         channel_id = str(message.channel.id)
         try:
@@ -552,11 +577,14 @@ async def step4(record):
 def show_cards(cards: list):
     now_cards = ""
     points = 0
+    a_count = 0
     for card in cards:
         now_cards += f"|:{deck_of_card[card]['suit']}:{deck_of_card[card]['number']}| "
         points += deck_of_card[card]['point']
         if deck_of_card[card]['point'] == 11:
-            points = points - 10 if points > 21 else points
+            a_count += 1
+    for _ in len(a_count):
+        points = points - 10 if points > 21 else points
     return now_cards, points
         
 def show_result(cards:list, points:int):
