@@ -583,7 +583,7 @@ def show_cards(cards: list):
         points += deck_of_card[card]['point']
         if deck_of_card[card]['point'] == 11:
             a_count += 1
-    for _ in len(a_count):
+    for _ in range(a_count):
         points = points - 10 if points > 21 else points
     return now_cards, points
         
