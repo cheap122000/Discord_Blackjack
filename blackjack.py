@@ -52,6 +52,9 @@ async def on_message(message:discord.Message):
     if message.author == client.user:
         return
 
+    if message.content.lower() == "bj!help":
+        pass
+
     if message.content.find("<@!938461513834962944>") != -1:
         await message.channel.send(f"<@!{message.author.id}> 衝啥? 輸贏???")
         return
