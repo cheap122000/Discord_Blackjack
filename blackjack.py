@@ -6,8 +6,10 @@ from db_bj import DB
 import asyncio
 import os, shutil
 from settings import *
+import help_center
 
 client = discord.Client()
+hpc = help_center.helpCenter()
 
 if not os.path.exists("./db_bj.db3"):
     shutil.copy("./db_bj2.db3", "./db_bj.db3")
@@ -52,8 +54,9 @@ async def on_message(message:discord.Message):
     if message.author == client.user:
         return
 
-    if message.content.lower() == "bj!help":
-        pass
+    if message.content.lower().startswith("bj!help"):
+        await message.channel.send(embed=hpc.set_help_center(message))
+        return
 
     if message.content.find("<@!938461513834962944>") != -1:
         await message.channel.send(f"<@!{message.author.id}> 衝啥? 輸贏???")
@@ -66,7 +69,7 @@ async def on_message(message:discord.Message):
             await message.reply("Error! Please wait for the last command finish.")
             return
 
-    if message.content.lower().startswith("!gamble"):
+    if message.content.lower().startswith("bj!gamble"):
         channel_id = str(message.channel.id)
         try:
             m_s = message.content.lower().split(" ")
