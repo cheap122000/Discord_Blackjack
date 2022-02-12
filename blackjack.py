@@ -411,7 +411,7 @@ async def step3(record):
     await record["message"].edit(embed=embed, content="Dealer's turn.")
     record["message2"] = None
 
-    while points < 17:
+    while points < 17 and len(record["dealer"]["cards"]) < 5:
         await asyncio.sleep(1.5)
         record["dealer"]["cards"].append(hit_a_card(record["cards"]))
         cards, points = show_cards(record["dealer"]["cards"])
