@@ -84,6 +84,16 @@ class DB:
         else:
             return 0
 
+    def query_guild_pool(self, guild_id):
+        rows = self.query_data(f"SELECT * FROM [pools] WHERE [guild_id]='{guild_id}'")
+        if len(rows):
+            prize = int(rows[0][2])
+            return prize
+        else:
+            self.operate_db(f"INSERT INTO [pools] ([guild_id], [prize]) VALUES ('{guild_id}', '0')")
+            return 0
+
+
     # def start_a_game(self, channel_id):
     #     rows = self.query_data(f"SELECT * FROM [games] WHERE [channel_id]='{channel_id}'")
 

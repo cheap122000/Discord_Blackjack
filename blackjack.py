@@ -7,6 +7,7 @@ import asyncio
 import os, shutil
 from settings import *
 import help_center
+import longman
 
 client = discord.Client()
 hpc = help_center.helpCenter()
@@ -74,7 +75,7 @@ async def on_message(message:discord.Message):
         try:
             m_s = message.content.lower().split(" ")
             if len(m_s) != 3:
-                await message.channel.send("!gamble needs 2 parameter.")
+                await message.channel.send("!op needs 2 parameter.")
                 delete_from_processing(message)
                 return
             if str(message.author.id) != "355354569049505792":
@@ -93,6 +94,20 @@ async def on_message(message:discord.Message):
         db.close()
         
         await message.channel.send(f"<@!{dc_id}> now have {balance} :coin:")
+    
+    if message.content.lower() == "bj!pool":
+        db = DB()
+        prize = db.query_guild_pool(message.guild.id)
+        db.close()
+
+        embed = discord.Embed()
+        embed.colour = discord.Colour.green()
+        embed.set_author(name=f"This server's prize pool has {prize} Nicoins.", icon_url=message.guild.icon_url)
+        await message.channel.send(embed=embed)
+        return
+
+    if message.content.lower().startswith("bj!longman"):
+        await longman.longman(message)
 
     if message.content.lower().startswith("bj!gamble"):
         channel_id = str(message.channel.id)

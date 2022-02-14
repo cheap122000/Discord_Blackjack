@@ -9,7 +9,7 @@ for i in range(52):
 
 new_deck = [i for i in range(52)]
 
-commands = ["bj!start", "bj!hit", "bj!daily", "bj!join", "bj!double", "bj!stand", "bj!p", "!gamble", "bj!op"]
+commands = ["bj!start", "bj!hit", "bj!daily", "bj!join", "bj!double", "bj!stand", "bj!p", "!gamble", "bj!op", "bj!longman"]
 
 turn_count = 30
 hit_count = 20
