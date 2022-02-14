@@ -63,6 +63,17 @@ async def on_message(message:discord.Message):
         await message.channel.send(f"<@!{message.author.id}> 衝啥? 輸贏???")
         return
 
+    if message.content.lower() == "bj!pool":
+        db = DB()
+        prize = db.query_guild_pool(message.guild.id)
+        db.close()
+
+        embed = discord.Embed()
+        embed.colour = discord.Colour.green()
+        embed.set_author(name=f"This server's prize pool has {prize} Nicoins.", icon_url=message.guild.icon_url)
+        await message.channel.send(embed=embed)
+        return
+
     if message.content.lower().startswith(tuple(commands)):
         if not is_in_processing(message):
             store_to_processing(message)
@@ -94,17 +105,6 @@ async def on_message(message:discord.Message):
         db.close()
         
         await message.channel.send(f"<@!{dc_id}> now have {balance} :coin:")
-    
-    if message.content.lower() == "bj!pool":
-        db = DB()
-        prize = db.query_guild_pool(message.guild.id)
-        db.close()
-
-        embed = discord.Embed()
-        embed.colour = discord.Colour.green()
-        embed.set_author(name=f"This server's prize pool has {prize} Nicoins.", icon_url=message.guild.icon_url)
-        await message.channel.send(embed=embed)
-        return
 
     if message.content.lower().startswith("bj!longman"):
         await longman.longman(message)
