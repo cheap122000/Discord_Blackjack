@@ -1,6 +1,6 @@
 import discord
 from discord_slash import SlashCommand
-from discord.ext.commands import Bot
+from discord.ext.commands import Bot, Context
 import json
 import random
 import time
@@ -12,12 +12,13 @@ import help_center
 import longman
 
 # client = discord.Client()
-client = Bot(command_prefix='-')
+client = Bot(command_prefix="$", intests=discord.Intents.all())
 slash = SlashCommand(client, sync_commands=True)
 hpc = help_center.helpCenter()
 
 @slash.slash(name="test1", description="test command")
-async def test(ctx):
+async def test(ctx: Context):
+    print(ctx.author.display_name)
     await ctx.send("hi")
 
 if not os.path.exists("./db_bj.db3"):
