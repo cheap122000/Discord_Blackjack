@@ -1,4 +1,6 @@
 import discord
+from discord_slash import SlashCommand
+from discord.ext.commands import Bot
 import json
 import random
 import time
@@ -9,8 +11,14 @@ from settings import *
 import help_center
 import longman
 
-client = discord.Client()
+# client = discord.Client()
+client = Bot(command_prefix='-')
+slash = SlashCommand(client, sync_commands=True)
 hpc = help_center.helpCenter()
+
+@slash.slash(name="test1", description="test command")
+async def test(ctx):
+    await ctx.send("hi")
 
 if not os.path.exists("./db_bj.db3"):
     shutil.copy("./db_bj2.db3", "./db_bj.db3")
