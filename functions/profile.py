@@ -1,7 +1,7 @@
 import discord
 from discord.ext.commands import Context
 import interactions
-from db_bj import DB
+from .db_game import DB
 
 def get_ctx_icon(ctx:interactions.CommandContext):
     return f"https://cdn.discordapp.com/avatars/{ctx.author.user.id}/{ctx.author.avatar}.webp?size=1024"
