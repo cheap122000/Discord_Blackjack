@@ -27,6 +27,10 @@ if not os.path.exists("./db_bj.db3"):
     shutil.copy("./db_bj2.db3", "./db_bj.db3")
     
 guild_ids = tools.get_guild_ids()
+print(guild_ids)
+guild_ids = [938896782807691345]
+print(guild_ids)
+guild_ids = None 
 
 processing_channel = {}
 processing_user = {}
@@ -164,16 +168,16 @@ async def c__start(ctx: interactions.CommandContext):
     if store_to_processing("", ctx):
         channel = client.get_channel(id=int(ctx.channel_id))
         await channel.send("hi")
-        # if blackjack.game_records.get(str(ctx.channel_id)):
-        #     await message.channel.send("A game has started! Please wait for the next game.")
-        # else:
-        #     embed = discord.Embed()
-        #     embed.type = "rich"
-        #     embed.set_author(name="A game is started! Use command \"!join\" to join this game. ")
-        #     embed.set_footer(text=f"The game will start in {turn_count} second(s).")
+        if blackjack.game_records.get(str(ctx.channel_id)):
+            await ctx.send("A game has started! Please wait for the next game.")
+        else:
+            embed = discord.Embed()
+            embed.type = "rich"
+            embed.set_author(name="A game is started! Use command \"!join\" to join this game. ")
+            embed.set_footer(text=f"The game will start in {turn_count} second(s).")
 
-        #     m = await message.channel.send(embed=embed)
-        #     loop.create_task(blackjack.game_task(message.channel, m))
+            m = await channel.send(embed=embed)
+            loop.create_task(blackjack.game_task(channel, m))
         delete_from_processing("", ctx)
         await ctx.send("A game is staring...")
     else:

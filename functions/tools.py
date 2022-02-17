@@ -14,6 +14,6 @@ def get_guild_ids():
     db = DB()
     ret = []
     rows = db.query_data(f"SELECT [guild_id] FROM [pools]")
-    ret = [row[0] for row in rows]
+    ret = [int(row[0]) for row in rows]
     db.close()
     return ret
