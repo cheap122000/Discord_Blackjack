@@ -4,6 +4,7 @@ import time
 import discord
 import random
 from functions.db_game import DB
+from discord.ui import Button, View
 
 game_records = {}
 
@@ -55,7 +56,10 @@ async def step(record):
     if time_left <= 0:
         record["step"] += 1
 
-    await record["message"].edit(embed=embed)
+    button = Button(label="Hit", style=discord.ButtonStyle.green)
+    view = View()
+    view.add_item(button)
+    await record["message"].edit(embed=embed, view=view)
 
 async def step1(record):
     embed = discord.Embed()

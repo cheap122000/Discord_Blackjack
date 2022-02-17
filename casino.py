@@ -1,7 +1,8 @@
-from unicodedata import name
 import discord
 from discord.ext.commands import Bot, Context
 import interactions
+from discord.ui import Button, View
+# from interactions import Button, ButtonStyle
 import json
 import random
 import time
@@ -28,7 +29,7 @@ hpc = help_center.helpCenter()
 if not os.path.exists("./db_bj.db3"):
     shutil.copy("./db_bj2.db3", "./db_bj.db3")
     
-guild_ids = [938896782807691345]
+guild_ids = [943730455755235339]
 # guild_ids = None 
 
 processing_channel = {}
@@ -113,7 +114,6 @@ async def c_help(message: Context):
 
 @bot.command(name="help", description="Help Center", scope=guild_ids)
 async def c__help(ctx: interactions.CommandContext):
-    print('HELP')
     await ctx.send(embeds=hpc.set_help_center("", ctx))
 
 # profile
@@ -242,7 +242,7 @@ async def c_bj_join(message: Context):
 
 @bot.command(name="bj_join", description="Join a BlackJack game", scope=guild_ids, 
     options=[interactions.Option(name="chips", description="How many chips do you want to bet?", required=True, type=interactions.OptionType.INTEGER, min_value=100)])
-async def c__join(ctx: interactions.CommandContext, chips: int):
+async def c__bj_join(ctx: interactions.CommandContext, chips: int):
     if store_to_processing("", ctx):
         channel = tools.get_channel_from_ctx(client, ctx)
         channel_id = str(channel.id)
@@ -263,7 +263,7 @@ async def c__join(ctx: interactions.CommandContext, chips: int):
                     delete_from_processing("", ctx)
                     return
                 db.close()
-                game_records[channel_id]["players"].append({"user_id": ctx.author.user.id, "user_name": get_ctx_display_name(ctx), "bet_amount": chips, "stand": False, "cards": [], "result": None})
+                game_records[channel_id]["players"].append({"user_id": int(ctx.author.user.id), "user_name": get_ctx_display_name(ctx), "bet_amount": chips, "stand": False, "cards": [], "result": None})
 
                 if async_delay > 2:
                     await blackjack.step(game_records[channel_id])
@@ -276,8 +276,62 @@ async def c__join(ctx: interactions.CommandContext, chips: int):
     else:
         await ctx.send("Error! Please wait for the last command finish.")
 
+## hit
+@client.command(name="hit")
+async def c_hit(message: Context):
+    if store_to_processing(message):
+        if blackjack.game_records.get(str(message.channel.id)):
+            channel_id = str(message.channel.id)
+            if game_records.get(channel_id):
+                turn = game_records[channel_id]["turn"]
+                if game_records[channel_id]["step"] != 2 or game_records[channel_id]["players"][turn]["user_id"] != message.author.id:
+                    await message.reply(f"Not your turn.")
+                    delete_from_processing(message)
+                    return
+                else:
+                    cards, points = blackjack.show_cards(game_records[channel_id]["players"][turn]["cards"])
+                    if (len(game_records[channel_id]['players'][turn]["cards"]) < 5 or points < 21) and not game_records[channel_id]['players'][turn]["stand"]:
+                        game_records[channel_id]['players'][turn]["cards"].append(blackjack.hit_a_card(game_records[channel_id]['cards']))
+                        game_records[channel_id]['hit'] = True
+                    else:
+                        await message.reply("Invalid command.")
+            else:
+                await message.reply(f"Use command bj!start to create a game first.")
+        delete_from_processing(message)
+    else:
+        await message.reply("Error! Please wait for the last command finish.")
+
+@bot.command(name="bj_hit", description="Hit a card", scope=guild_ids)
+async def c__hit(ctx: interactions.CommandContext):
+    if store_to_processing("", ctx):
+        channel = tools.get_channel_from_ctx(client, ctx)
+        channel_id = str(channel.id)
+        if blackjack.game_records.get(str(channel_id)):
+            if game_records.get(channel_id):
+                turn = game_records[channel_id]["turn"]
+                if game_records[channel_id]["step"] != 2 or game_records[channel_id]["players"][turn]["user_id"] != int(ctx.author.user.id):
+                    await ctx.send(f"Not your turn.")
+                    delete_from_processing("", ctx)
+                    return
+                else:
+                    cards, points = blackjack.show_cards(game_records[channel_id]["players"][turn]["cards"])
+                    if (len(game_records[channel_id]['players'][turn]["cards"]) < 5 or points < 21) and not game_records[channel_id]['players'][turn]["stand"]:
+                        game_records[channel_id]['players'][turn]["cards"].append(blackjack.hit_a_card(game_records[channel_id]['cards']))
+                        game_records[channel_id]['hit'] = True
+                    else:
+                        await ctx.send("Invalid command.")
+            else:
+                await ctx.send(f"Use command `bj_start` to create a game first.")
+        delete_from_processing("", ctx)
+        m = await ctx.send("success", ephemeral=True)
+        await asyncio.sleep(0.5)
+        m.delete()
+    else:
+        await ctx.send("Error! Please wait for the last command finish.")
+
 loop = asyncio.get_event_loop()
-task2 = loop.create_task(client.start(token, bot=True))
+# task2 = loop.create_task(client.start(token, bot=True))
+task2 = loop.create_task(client.start(token))
 task1 = loop.create_task(bot.start())
 
 gathered = asyncio.gather(task1, task2, loop=loop)
