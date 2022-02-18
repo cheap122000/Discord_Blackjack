@@ -106,7 +106,7 @@ async def hi4(ctx):
     await ctx.respond("HI")
 
 @bot_c.command()
-async def a(ctx):
+async def a(ctx: commands.Context):
     await ctx.send("ctest")
 
 
