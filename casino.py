@@ -19,8 +19,8 @@ import longman
 with open("./token_dev.txt", "r", encoding="utf8") as f:
     token = f.read()
 
-intents = discord.Intents.default()
-intents.messages = True
+intents = discord.Intents.all()
+# intents.messages = True
 
 bot_s = discord.Bot() # slash command bot
 bot_c = commands.Bot(command_prefix="bj!", intents=intents) # command bot
@@ -107,7 +107,6 @@ async def hi4(ctx):
 
 @bot_c.command()
 async def a(ctx):
-    print("Q_Q")
     await ctx.send("ctest")
 
 
