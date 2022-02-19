@@ -1,8 +1,10 @@
 from .db_game import DB
 from discord.ext.commands import Bot
 import time
+from typing import Optional, Union
 from discord.ext.commands.context import Context
 from discord.commands.context import ApplicationContext
+import asyncio
 
 processing_channel = {}
 processing_user = {}
@@ -14,51 +16,47 @@ initial_finished = True
 guild_ids = [944092609066962975]
 # guild_ids = None 
 
-def store_to_processing(message, ctx=None):
-    if is_in_processing(message, ctx) or not initial_finished:
+loop = asyncio.get_event_loop()
+
+def store_to_processing(ctx: Optional[Union[Context, ApplicationContext]]):
+    if is_in_processing(ctx) or not (bot_s_is_ready and bot_c_is_ready):
         return False
     else:
-        if ctx:
-            processing_channel[str(ctx.channel_id)] = int(time.time())
-            processing_user[str(ctx.author.user.id)] = int(time.time())
+        processing_channel[str(ctx.channel.id)] = int(time.time())
+        processing_user[str(ctx.author.id)] = int(time.time())
+        return True
+
+def delete_from_processing(ctx: Optional[Union[Context, ApplicationContext]]):
+    processing_channel.pop(str(ctx.channel.id))
+    processing_user.pop(str(ctx.author.id))
+
+def is_in_processing(ctx: Optional[Union[Context, ApplicationContext]]):
+    p_time = processing_channel.get(str(ctx.channel.id))
+    now_time = int(time.time())
+    if p_time:
+        if now_time - p_time < 30:
             return True
-        else:
-            processing_channel[str(message.channel.id)] = int(time.time())
-            processing_user[str(message.author.id)] = int(time.time())
+    
+    p_time = processing_user.get(str(ctx.author.id))
+    if p_time:
+        if now_time - p_time < 30:
             return True
 
-def delete_from_processing(message, ctx=None):
-    if ctx:
-        processing_channel.pop(str(ctx.channel_id))
-        processing_user.pop(str(ctx.author.user.id))
+    return False
+
+async def send_message(ctx: Optional[Union[Context, ApplicationContext]], *args, **kwargs):
+    if isinstance(ctx, Context):
+        if kwargs.get("ephemeral"):
+            return
+        await ctx.send(*args, **kwargs)
     else:
-        processing_channel.pop(str(message.channel.id))
-        processing_user.pop(str(message.author.id))
+        await ctx.respond(*args, **kwargs)
 
-def is_in_processing(message:Context, ctx=None):
-    if ctx:
-        p_time = processing_channel.get(str(ctx.channel_id))
-        now_time = int(time.time())
-        if p_time:
-            if now_time - p_time < 30:
-                return True
-        
-        p_time = processing_user.get(str(ctx.author.user.id))
-        if p_time:
-            if now_time - p_time < 30:
-                return True
+async def create_message(ctx: Optional[Union[Context, ApplicationContext]], *args, **kwargs):
+    return await ctx.send(*args, **kwargs)
 
-        return False
+async def reply_message(ctx: Optional[Union[Context, ApplicationContext]], *args, **kwargs):
+    if isinstance(ctx, Context):
+        return await ctx.reply(*args, **kwargs)
     else:
-        p_time = processing_channel.get(str(message.channel.id))
-        now_time = int(time.time())
-        if p_time:
-            if now_time - p_time < 30:
-                return True
-        
-        p_time = processing_user.get(str(message.author.id))
-        if p_time:
-            if now_time - p_time < 30:
-                return True
-
-        return False
+        return await ctx.respond(*args, **kwargs)

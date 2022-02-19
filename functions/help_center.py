@@ -28,7 +28,7 @@ class helpCenter():
 
         return embed
 
-    def set_help_center(self, message:Context, ctx:ApplicationContext):
+    def set_help_center(self, message:Context, ctx:ApplicationContext=None):
         if ctx:
             embed = discord.Embed()
             embed.colour = discord.Colour.purple()

@@ -7,6 +7,7 @@ from functions.db_game import DB
 from discord.ui import Button, View
 
 game_records = {}
+turn_count = 10
 
 async def game_task(channel, m):
     # db = DB()
@@ -57,8 +58,12 @@ async def step(record):
         record["step"] += 1
 
     button = Button(label="Hit", style=discord.ButtonStyle.green)
+    button2 = Button(label="Double", style=discord.ButtonStyle.primary)
+    button3 = Button(label="Stand", style=discord.ButtonStyle.red)
     view = View()
     view.add_item(button)
+    view.add_item(button2)
+    view.add_item(button3)
     await record["message"].edit(embed=embed, view=view)
 
 async def step1(record):
@@ -88,6 +93,7 @@ async def step1(record):
             await asyncio.sleep(1)
             record["players"][i]["cards"].append(hit_a_card(record["cards"]))
             
+            # delete the point finger
             if i == 0:
                 ix = n_players - 1
                 cards, points = show_cards(record["players"][ix]["cards"])
@@ -106,6 +112,7 @@ async def step1(record):
     await asyncio.sleep(1)
     embed.set_field_at(n_players, name=f"{record['players'][n_players - 1]['user_name']}", value=f"chips: {record['players'][n_players - 1]['bet_amount']} :coin:\ncards: {cards}", inline=False)
     await record["message"].edit(embed=embed, content=None)
+    record["message"].embeds[0] = embed
 
     record["step"] += 1
 
@@ -117,10 +124,6 @@ async def step2(record):
     for i, p in enumerate(record["players"]):
         record['turn'] = i
         cards, points = show_cards(p["cards"])
-
-        # if i > 0:
-        #     record["message"].embeds[0].set_field_at(i, name=f"{record['players'][i]['user_name']}", value=f"chips: {record['players'][i]['bet_amount']} :coin:\ncards: {cards}", inline=False)
-        #     await record["message"].edit(embed=record["message"].embeds[0], content=f"{p['user_name']}'s turn.")
 
         record["message"].embeds[0].set_field_at(i+1, name=f":point_right: {record['players'][i]['user_name']}", value=f"chips: {record['players'][i]['bet_amount']} :coin:\ncards: {cards}", inline=False)
         await record["message"].edit(embed=record["message"].embeds[0], content=f"{p['user_name']}'s turn.")

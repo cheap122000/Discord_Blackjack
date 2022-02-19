@@ -12,12 +12,7 @@ import os, shutil
 from games.game_config import *
 from functions import help_center, tools
 import longman
-from cogs import cog_profile
-# import functions.profile as profile
-# from functions import help_center
-# from functions.db_game import DB
-# from games.blackjack import game_records
-# from games import blackjack
+from cogs import cog_profile, cog_blackjack
 
 with open("./token_dev.txt", "r", encoding="utf8") as f:
     token = f.read()
@@ -46,22 +41,23 @@ async def on_ready():
 
 # help
 @bot_c.command(name="help")
-async def c_help(message: Context):
-    print(type(message))
-    await message.channel.send(embed=hpc.set_help_center(message))
+async def c_help(ctx: Context):
+    await tools.send_message(ctx, embed=hpc.set_help_center(message=ctx))
 
 @bot_s.slash_command(name="help", description="Help Center", guild_ids=tools.guild_ids)
 async def c__help(ctx: ApplicationContext):
-    await ctx.respond(embed=hpc.set_help_center(None, ctx))
+    await tools.send_message(ctx, embed=hpc.set_help_center(None, ctx))
 
 
 bot_c.add_cog(cog_profile.c_profile(bot_c))
 bot_s.add_cog(cog_profile.s_profile(bot_s))
 
-loop = asyncio.get_event_loop()
-task2 = loop.create_task(bot_c.start(token))
-task1 = loop.create_task(bot_s.start(token))
+bot_c.add_cog(cog_blackjack.c_bj(bot_c))
+bot_s.add_cog(cog_blackjack.s_bj(bot_s))
 
 
-gathered = asyncio.gather(task1, task2, loop=loop)
-loop.run_until_complete(gathered)
+task2 = tools.loop.create_task(bot_c.start(token))
+task1 = tools.loop.create_task(bot_s.start(token))
+
+gathered = asyncio.gather(task1, task2, loop=tools.loop)
+tools.loop.run_until_complete(gathered)
