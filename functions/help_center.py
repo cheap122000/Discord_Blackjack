@@ -1,5 +1,6 @@
 import discord
-import interactions
+from discord.commands.context import ApplicationContext
+from discord.ext.commands.context import Context
 
 class helpCenter():
     def __init__(self):
@@ -27,22 +28,21 @@ class helpCenter():
 
         return embed
 
-    def set_help_center(self, message:discord.Message, ctx:interactions.CommandContext=None):
+    def set_help_center(self, message:Context, ctx:ApplicationContext):
         if ctx:
-            a = interactions.EmbedAuthor(name="NicoJack Help Center", icon_url="https://i.imgur.com/YFo8xQ1.jpg")
-            ft = interactions.EmbedFooter(text=f"{ctx.author.nick}#{ctx.author.user.discriminator}. Use slash commands to play games eaily.")
-            fds = [
-                interactions.EmbedField(name=":coin: Infos", value="`profile`, `daily`", inline=True),
-                interactions.EmbedField(name=":coin: BlackJack", value="`bj_start`, `bj_join`", inline=True),
-                interactions.EmbedField(name=":coin: Gamble", value="`gamble`", inline=True)
-            ]
-            embed = interactions.Embed(author=a, footer=ft, fields=fds, color=discord.Colour.blurple().value)
+            embed = discord.Embed()
+            embed.colour = discord.Colour.purple()
+            embed.set_author(name="NicoJack Help Center", icon_url="https://i.imgur.com/YFo8xQ1.jpg")
+            embed.set_footer(text=f"{ctx.author.display_name}#{ctx.author.discriminator}. Use slash commands to play games eaily.")
+            embed.add_field(name=":coin: Infos", value="`profile`, `daily`", inline=True)
+            embed.add_field(name=":coin: BlackJack", value="`bj_start`, `bj_join`", inline=True)
+            embed.add_field(name=":coin: Gamble", value="`gamble`", inline=True)
 
             return embed
         else:
             commands = message.message.content.lower().split(" ")
             if len(commands) == 1:
-                self.help.set_footer(text=f"{message.author.display_name}#{message.author.discriminator}. Use bj!help <command> for more detailed instructions.", icon_url=message.author.avatar_url)
+                self.help.set_footer(text=f"{message.author.display_name}#{message.author.discriminator}. Use bj!help <command> for more detailed instructions.", icon_url=message.author.avatar)
                 return self.help
             elif len(commands) == 2:
                 if commands[1] in ["p", "bj!p"]:
