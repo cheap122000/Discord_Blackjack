@@ -1,15 +1,16 @@
 # Discord_BlackJack
 
 ## First setup
-- Create a new file named "token.txt".
+- Create two new files named "token.txt" and "token_dev.txt".
 - Paste your discord bot's token in "token.txt".
+- Paste your development discord bot's token in "token_dev.txt".
 
-## For 10.5 bot
-```
-$ python jack.py
-```
+- Create another file name "token_setting.json"
+- `{"dev": true, "guild_ids": [your_dev_dicord_guild_id]}`
+    - if "dev" is true, "guild_ids" will pass to your slash command, token will be "token_dev.txt"
+    - else, slash command's guild_ids will be None, token will be "token.txt"
 
-## For Black Jack bot (not finished yet)
+## Casino bot
 ```
-$ python blackjack.py
+$ python casino.py
 ```

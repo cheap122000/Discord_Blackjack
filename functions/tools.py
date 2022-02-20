@@ -5,6 +5,7 @@ from typing import Optional, Union
 from discord.ext.commands.context import Context
 from discord.commands.context import ApplicationContext
 import asyncio
+import json
 
 processing_channel = {}
 processing_user = {}
@@ -13,7 +14,17 @@ bot_s_is_ready = False
 bot_c_is_ready = False
 initial_finished = True
 
-guild_ids = [944092609066962975]
+with open("./token_setting.json", "r", encoding="utf8") as f:
+    setting = json.loads(f.read())
+
+if setting["dev"]:
+    with open("./token_dev.txt", "r", encoding="utf8") as f:
+        token = f.read()
+        guild_ids = None
+else:
+    with open("./token.txt", "r", encoding="utf8") as f:
+        token = f.read()
+        guild_ids = [944092609066962975]
 # guild_ids = None 
 
 loop = asyncio.get_event_loop()

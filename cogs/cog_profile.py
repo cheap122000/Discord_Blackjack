@@ -1,7 +1,7 @@
 import discord
 from discord.ext import commands
 from discord.ext.commands.context import Context
-from discord.commands import slash_command
+from discord.commands import slash_command, Option
 from discord.commands.context import ApplicationContext
 from functions.tools import guild_ids
 from functions import profile
@@ -27,8 +27,10 @@ class s_profile(commands.Cog):
         self.bot = bot
 
     @slash_command(name="profile", description="Show your profile.", guild_ids=guild_ids)
-    async def profile(self, ctx: ApplicationContext):
-        embed = profile.get_profile(ctx)
+    async def profile(self, ctx: ApplicationContext, user: discord.Member=None):
+        user = user or ctx.author
+        print(user.id)
+        embed = profile.get_profile(ctx, user)
         await ctx.respond(embed=embed)
 
     @slash_command(name="daily", description="Get your daily Nicoins.", guild_ids=guild_ids)

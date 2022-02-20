@@ -4,10 +4,87 @@ import time
 import discord
 import random
 from functions.db_game import DB
-from discord.ui import Button, View
+from discord.ui import Button, View, button
+from discord import ButtonStyle
 
 game_records = {}
 turn_count = 10
+
+class BJ_View(View):
+    @button(label="Hit", style=ButtonStyle.green, emoji="✋")
+    async def hit_callback(self, button: discord.Button, interaction: discord.Interaction):
+        channel_id = str(interaction.channel.id)
+
+        if game_records.get(channel_id):
+            turn = game_records[channel_id]["turn"]
+            if game_records[channel_id]["step"] != 2 or game_records[channel_id]["players"][turn]["user_id"] != interaction.user.id:
+                await interaction.response.send_message(f"Not your turn.", delete_after=1)
+                # delete_from_processing(message)
+                return
+            else:
+                cards, points = show_cards(game_records[channel_id]["players"][turn]["cards"])
+                if (len(game_records[channel_id]['players'][turn]["cards"]) < 5 or points < 21) and not game_records[channel_id]['players'][turn]["stand"]:
+                    game_records[channel_id]['players'][turn]["cards"].append(hit_a_card(game_records[channel_id]['cards']))
+                    game_records[channel_id]['hit'] = True
+                else:
+                    await interaction.response.send_message("Invalid command.", delete_after=1)
+        else:
+            await interaction.response.send_message(f"Use command bj!start to create a game first.", delete_after=1)
+
+    @button(label="Double", style=ButtonStyle.primary, emoji="🪙")
+    async def double_callback(self, button: discord.Button, interaction: discord.Interaction):
+        channel_id = str(interaction.channel.id)
+
+        if game_records.get(channel_id):
+            turn = game_records[channel_id]["turn"]
+            if game_records[channel_id]["step"] != 2 or game_records[channel_id]["players"][turn]["user_id"] != interaction.user.id:
+                await interaction.response.send_message(f"Not your turn.", delete_after=1)
+                # delete_from_processing(message)
+                return
+            else:
+                cards, points = show_cards(game_records[channel_id]["players"][turn]["cards"])
+                if len(game_records[channel_id]['players'][turn]["cards"]) == 2 and points < 21 and not game_records[channel_id]['players'][turn]["stand"]:
+                    game_records[channel_id]['start_time'] = int(time.time())
+                    game_records[channel_id]['players'][turn]["stand"] = True
+                    db = DB()
+                    success, balance = db.bet(interaction.user.id, game_records[channel_id]['players'][turn]["bet_amount"])
+                    if success:
+                        await interaction.response.send_message(f"You doubled, now you left {balance} Nicoins.")
+                        game_records[channel_id]['players'][turn]["bet_amount"] *= 2
+                    else:
+                        await interaction.response.send_message(f"You don't have enough Nicoins to double. Your Nicoins: {balance}")
+                        db.close()
+                        # delete_from_processing(message)
+                        return
+                    db.close()
+
+                    game_records[channel_id]['players'][turn]["cards"].append(hit_a_card(game_records[channel_id]['cards']))
+                    game_records[channel_id]['hit'] = True
+                else:
+                    await interaction.response.send_message("Invalid command.", delete_after=1)
+        else:
+            await interaction.response.send_message(f"Use command bj!start to create a game first.", delete_after=1)
+
+    @button(label="Stand", style=ButtonStyle.red, emoji="🛑")
+    async def stand_callback(self, button: discord.Button, interaction: discord.Interaction):
+        channel_id = str(interaction.channel.id)
+
+        if game_records.get(channel_id):
+            turn = game_records[channel_id]["turn"]
+            if game_records[channel_id]["step"] != 2 or game_records[channel_id]["players"][turn]["user_id"] != interaction.user.id:
+                await interaction.response.send_message(f"Not your turn.", delete_after=1)
+                # delete_from_processing(message)
+                return
+            else:
+                cards, points = show_cards(game_records[channel_id]["players"][turn]["cards"])
+                if (len(game_records[channel_id]['players'][turn]["cards"]) < 5 or points < 21):
+                    game_records[channel_id]['hit'] = True
+                    game_records[channel_id]['start_time'] = int(time.time()) - hit_count + 5
+                    game_records[channel_id]['players'][turn]["stand"] = True
+                else:
+                    await interaction.response.send_message("Invalid command.", delete_after=1)
+        else:
+            await interaction.response.send_message(f"Use command bj!start to create a game first.", delete_after=1)
 
 async def game_task(channel, m):
     # db = DB()
@@ -57,14 +134,9 @@ async def step(record):
     if time_left <= 0:
         record["step"] += 1
 
-    button = Button(label="Hit", style=discord.ButtonStyle.green)
-    button2 = Button(label="Double", style=discord.ButtonStyle.primary)
-    button3 = Button(label="Stand", style=discord.ButtonStyle.red)
-    view = View()
-    view.add_item(button)
-    view.add_item(button2)
-    view.add_item(button3)
-    await record["message"].edit(embed=embed, view=view)
+    # record["embed"] = embed
+    # await record["message"].edit(embed=embed, view=BJ_View())
+    await record["message"].edit(embed=embed)
 
 async def step1(record):
     embed = discord.Embed()
@@ -85,7 +157,10 @@ async def step1(record):
         
     for i, item in enumerate(record["players"]):
         embed.add_field(name=item["user_name"], value=f"chips: {item['bet_amount']} :coin:\ncards: ", inline=False)
-    await record["message"].edit(embed=embed, content=content)
+
+    await record["message"].delete()
+    # await record["message"].edit(embed=embed, content=content)
+    record["message"] = await record["message"].channel.send(embed=embed, content=content, view=BJ_View())
 
     embed.set_field_at(0, name="Dealer", value=f"cards: {dealer_cards}", inline=False)
     for _ in range(2):
@@ -127,8 +202,9 @@ async def step2(record):
 
         record["message"].embeds[0].set_field_at(i+1, name=f":point_right: {record['players'][i]['user_name']}", value=f"chips: {record['players'][i]['bet_amount']} :coin:\ncards: {cards}", inline=False)
         await record["message"].edit(embed=record["message"].embeds[0], content=f"{p['user_name']}'s turn.")
-        m = await record["message"].channel.send(f"<@!{p['user_id']}>'s turn. bj!stand / bj!hit / bj!double\nYour chips: {record['players'][i]['bet_amount']} :coin:. Your card(s): {cards}\nYou left {hit_count} second(s).")
-        record["message2"] = m
+        msg = f"<@!{p['user_id']}>'s turn. bj!stand / bj!hit / bj!double\nYour chips: {record['players'][i]['bet_amount']} :coin:. Your card(s): {cards}\nYou left {hit_count} second(s)."
+        # m = await record["message"].channel.send(f"<@!{p['user_id']}>'s turn. bj!stand / bj!hit / bj!double\nYour chips: {record['players'][i]['bet_amount']} :coin:. Your card(s): {cards}\nYou left {hit_count} second(s).")
+        # record["message2"] = m
 
         record['start_time'] = int(time.time())
         mem = 0
@@ -146,8 +222,8 @@ async def step2(record):
                 if record["hit"]:
                     record['start_time'] = int(time.time())
                     record["hit"] = False
-                    await record["message2"].delete()
-                    record["message2"] = None
+                    # await record["message2"].delete()
+                    # record["message2"] = None
                     time_left = hit_count
 
                 if points > 21:
@@ -172,20 +248,24 @@ async def step2(record):
                     else:
                         msg = f"<@!{record['players'][i]['user_id']}>'s turn. bj!stand / bj!hit\nYour chips: {record['players'][i]['bet_amount']} :coin:. Your card(s): {cards}\nYou left {time_left} second(s)."
 
-                if record["message2"]:
-                    await record["message2"].edit(content=msg)
-                else:
-                    record['start_time'] = int(time.time())
-                    record["message2"] = await record["message"].channel.send(msg)
+                await record["message"].edit(content=msg)
+                
+                # if record["message2"]:
+                #     await record["message2"].edit(content=msg)
+                # else:
+                #     record['start_time'] = int(time.time())
+                #     record["message2"] = await record["message"].channel.send(msg)
                     
                 
                 record["message"].embeds[0].set_field_at(i+1, name=f":point_right: {record['players'][i]['user_name']}", value=f"chips: {record['players'][i]['bet_amount']} :coin:\ncards: {cards}", inline=False)
-                await record["message"].edit(embed=record["message"].embeds[0], content=f"{record['players'][i]['user_name']}'s turn.")
+                # await record["message"].edit(embed=record["message"].embeds[0], content=f"{record['players'][i]['user_name']}'s turn.")
+                await record["message"].edit(embed=record["message"].embeds[0])
 
             await asyncio.sleep(0.8)
             if time_left2 < 1.6:
                 record["message"].embeds[0].set_field_at(i+1, name=f"{record['players'][i]['user_name']}", value=f"chips: {record['players'][i]['bet_amount']} :coin:\ncards: {cards}", inline=False)
-                await record["message"].edit(embed=record["message"].embeds[0], content=f"{record['players'][i]['user_name']}'s turn.")
+                # await record["message"].edit(embed=record["message"].embeds[0], content=f"{record['players'][i]['user_name']}'s turn.")
+                await record["message"].edit(embed=record["message"].embeds[0])
                 break
     record["step"] += 1
 
@@ -196,7 +276,7 @@ async def step3(record):
     embed.set_field_at(0, name=f":point_right: Dealer", value=f"cards: {cards}", inline=False)
     embed.set_author(name=f"It's Dealer's turn.")
     await record["message"].edit(embed=embed, content="Dealer's turn.")
-    record["message2"] = None
+    # record["message2"] = None
 
     while points < 17 and len(record["dealer"]["cards"]) < 5:
         await asyncio.sleep(1.5)
@@ -205,10 +285,10 @@ async def step3(record):
         embed.set_field_at(0, name=f":point_right: Dealer", value=f"cards: {cards}", inline=False)
         await record["message"].edit(embed=embed, content="Dealer's turn.")
 
-        if record["message2"]:
-            await record["message2"].edit(content=f"Dealer's turn. Dealer's cards: {cards}")
-        else:
-            record["message2"] = await channel.send(f"Dealer's turn. Dealer's cards: {cards}")
+        # if record["message2"]:
+        #     await record["message2"].edit(content=f"Dealer's turn. Dealer's cards: {cards}")
+        # else:
+        #     record["message2"] = await channel.send(f"Dealer's turn. Dealer's cards: {cards}")
 
     embed.set_field_at(0, name=f"Dealer", value=f"cards: {cards}", inline=False)
     await record["message"].edit(embed=embed, content="Dealer's turn.")
@@ -242,7 +322,8 @@ async def step4(record):
             elif dealer_result == "Black Jack":
                 balance = p["bet_amount"] * -1.5
             else:
-                balance = p["bet_amount"] * 1.25
+                # balance = p["bet_amount"] * 1.25
+                balance = p["bet_amount"] * 3
         elif result == "Busted":
             if dealer_result == "Black Jack":
                 balance = p["bet_amount"] * -1.5
@@ -288,6 +369,7 @@ async def step4(record):
             b = db.get_balance(item, int(temp[item]['balance']))
             all_balance += f"<@!{item}> lost {temp[item]['profit']} :coin:, now have {b} :coin:\n"    
     db.close()
+    await record["message"].edit(view=None)
     await record["message"].channel.send(embed=embed, content=f"Result:\n{all_balance}")
 
     record["step"] += 1

@@ -2,6 +2,11 @@ card.db3
 db_bj.db3
 token.txt
 token_dev.txt
+token_setting.json
 __pycache__*
 test*
 venv*
+node_modules/
+.DS_Store
+.gitignore
+_config.yml

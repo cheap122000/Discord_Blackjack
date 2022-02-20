@@ -12,10 +12,9 @@ import os, shutil
 from games.game_config import *
 from functions import help_center, tools
 import longman
-from cogs import cog_profile, cog_blackjack
+from cogs import cog_profile, cog_blackjack, cog_gamble
 
-with open("./token_dev.txt", "r", encoding="utf8") as f:
-    token = f.read()
+token = tools.token
 
 intents = discord.Intents.all()
 
@@ -54,6 +53,9 @@ bot_s.add_cog(cog_profile.s_profile(bot_s))
 
 bot_c.add_cog(cog_blackjack.c_bj(bot_c))
 bot_s.add_cog(cog_blackjack.s_bj(bot_s))
+
+bot_c.add_cog(cog_gamble.c_gamble(bot_c))
+bot_s.add_cog(cog_gamble.s_gamble(bot_s))
 
 
 task2 = tools.loop.create_task(bot_c.start(token))

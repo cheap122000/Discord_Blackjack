@@ -33,7 +33,7 @@ class helpCenter():
             embed = discord.Embed()
             embed.colour = discord.Colour.purple()
             embed.set_author(name="NicoJack Help Center", icon_url="https://i.imgur.com/YFo8xQ1.jpg")
-            embed.set_footer(text=f"{ctx.author.display_name}#{ctx.author.discriminator}. Use slash commands to play games eaily.")
+            embed.set_footer(text=f"{ctx.author.display_name}#{ctx.author.discriminator}. Use slash commands to play games eaily.", icon_url=ctx.author.display_avatar)
             embed.add_field(name=":coin: Infos", value="`profile`, `daily`", inline=True)
             embed.add_field(name=":coin: BlackJack", value="`bj_start`, `bj_join`", inline=True)
             embed.add_field(name=":coin: Gamble", value="`gamble`", inline=True)
@@ -42,7 +42,7 @@ class helpCenter():
         else:
             commands = message.message.content.lower().split(" ")
             if len(commands) == 1:
-                self.help.set_footer(text=f"{message.author.display_name}#{message.author.discriminator}. Use bj!help <command> for more detailed instructions.", icon_url=message.author.avatar)
+                self.help.set_footer(text=f"{message.author.display_name}#{message.author.discriminator}. Use bj!help <command> for more detailed instructions.", icon_url=message.author.display_avatar)
                 return self.help
             elif len(commands) == 2:
                 if commands[1] in ["p", "bj!p"]:
