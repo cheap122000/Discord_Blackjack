@@ -20,11 +20,11 @@ with open("./token_setting.json", "r", encoding="utf8") as f:
 if setting["dev"]:
     with open("./token_dev.txt", "r", encoding="utf8") as f:
         token = f.read()
-        guild_ids = None
+        guild_ids = setting["guild_ids"]
 else:
     with open("./token.txt", "r", encoding="utf8") as f:
         token = f.read()
-        guild_ids = [944092609066962975]
+        guild_ids = None
 # guild_ids = None 
 
 loop = asyncio.get_event_loop()
