@@ -8,7 +8,7 @@ from discord.ui import Button, View, button
 from discord import ButtonStyle
 
 game_records = {}
-turn_count = 10
+turn_count = 30
 
 class BJ_View(View):
     @button(label="Hit", style=ButtonStyle.green, emoji="✋")
