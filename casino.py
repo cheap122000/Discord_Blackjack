@@ -11,7 +11,7 @@ import os, shutil
 from games.game_config import *
 from functions import help_center, tools
 import longman
-from cogs import cog_profile, cog_blackjack, cog_gamble
+from cogs import cog_profile, cog_blackjack, cog_gamble, cog_balance
 
 token = tools.token
 
@@ -44,5 +44,6 @@ async def c__help(ctx: ApplicationContext):
 bot.add_cog(cog_profile.Profile(bot))
 bot.add_cog(cog_blackjack.BJGame(bot))
 bot.add_cog(cog_gamble.GambleGame(bot))
+bot.add_cog(cog_balance.Balance(bot))
 
 bot.run(token)

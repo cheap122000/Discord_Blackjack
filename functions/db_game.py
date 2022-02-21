@@ -82,7 +82,8 @@ class DB:
             self.operate_db(f"UPDATE [users] SET [currency]='{balance}' WHERE [dc_id]='{dc_id}'")
             return balance
         else:
-            return 0
+            self.operate_db(f"INSERT INTO [users] ([dc_id], [currency], [daily]) VALUES ('{dc_id}', '{bet_amount}', '0')")
+            return bet_amount
 
     def query_guild_pool(self, guild_id):
         rows = self.query_data(f"SELECT * FROM [pools] WHERE [guild_id]='{guild_id}'")
