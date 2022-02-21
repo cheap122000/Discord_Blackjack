@@ -20,7 +20,7 @@ class Balance(commands.Cog):
             embed.set_author(name=f"{ctx.author.display_name} give {chips} Nicoins to {user.display_name}", icon_url=ctx.author.display_avatar)
             embed.add_field(name=f"{ctx.author.display_name}#{ctx.author.discriminator}", value=f"now have {balance_author} :coin:", inline=False)
             embed.add_field(name=f"{user.display_name}#{user.discriminator}", value=f"now have {balance_user} :coin:", inline=False)
-            await send_message(ctx, embed=embed)
+            await send_message(ctx, f"<@!{ctx.author.id}> give {chips} Nicoins to <@!{user.id}>", embed=embed)
         else:
             await send_message(ctx, "You don't have enough chips", ephemeral=True)
 
