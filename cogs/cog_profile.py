@@ -47,6 +47,7 @@ class c_profile(commands.Cog):
             db.close()
             
             await ctx.send(f"<@!{dc_id}> now have {balance} :coin:")
+            tools.delete_from_processing(ctx)
         else:
             await ctx.reply(ctx, "Error! Please wait for the last command finish.")
 
