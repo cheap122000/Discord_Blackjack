@@ -10,8 +10,7 @@ import json
 processing_channel = {}
 processing_user = {}
 
-bot_s_is_ready = False
-bot_c_is_ready = False
+bot_is_ready = False
 initial_finished = True
 
 with open("./token_setting.json", "r", encoding="utf8") as f:
@@ -30,7 +29,7 @@ else:
 loop = asyncio.get_event_loop()
 
 def store_to_processing(ctx: Optional[Union[Context, ApplicationContext]]):
-    if is_in_processing(ctx) or not (bot_s_is_ready and bot_c_is_ready):
+    if is_in_processing(ctx) or not bot_is_ready:
         return False
     else:
         processing_channel[str(ctx.channel.id)] = int(time.time())

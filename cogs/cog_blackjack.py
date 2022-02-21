@@ -6,16 +6,16 @@ from discord.commands.context import ApplicationContext
 from functions.tools import *
 from games import blackjack
 
-class c_bj(commands.Cog):
+class BJGame(commands.Cog):
     def __init__(self, bot) -> None:
         self.bot = bot
 
     @commands.command(name="start")
-    async def start(self, ctx: Context):
+    async def c_start(self, ctx: Context):
         await start(ctx)
 
     @commands.command(name="join")
-    async def join(self, ctx: Context):
+    async def c_join(self, ctx: Context):
         try:
             m_s = ctx.message.content.lower().split(" ")
             if len(m_s) != 2:
@@ -30,16 +30,12 @@ class c_bj(commands.Cog):
             return
         await join(ctx, bet_amount)
 
-class s_bj(commands.Cog):
-    def __init__(self, bot) -> None:
-        self.bot = bot
-
     @slash_command(name="bj_start", description="Start a BlackJack game", guild_ids=guild_ids)
-    async def start(self, ctx: ApplicationContext):
+    async def s_start(self, ctx: ApplicationContext):
         await start(ctx)
 
     @slash_command(name="bj_join", description="Join a BlackJack game", guild_ids=guild_ids)
-    async def join(self, ctx: ApplicationContext, chips: Option(int, "How many chips you want to bet?", min_value=100)):
+    async def s_join(self, ctx: ApplicationContext, chips: Option(int, "How many chips you want to bet?", min_value=100)):
         await join(ctx, chips)
 
 async def start(ctx: Optional[Union[Context, ApplicationContext]]):

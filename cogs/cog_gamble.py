@@ -6,12 +6,12 @@ from discord.commands.context import ApplicationContext
 from functions.tools import *
 import random
 
-class c_gamble(commands.Cog):
+class GambleGame(commands.Cog):
     def __init__(self, bot) -> None:
         self.bot = bot
 
     @commands.command(name="gamble")
-    async def gamble(self, ctx: Context):
+    async def c_gamble(self, ctx: Context):
         try:
             m_s = ctx.message.content.lower().split(" ")
             if len(m_s) != 2:
@@ -26,12 +26,8 @@ class c_gamble(commands.Cog):
             return
         await gamble(ctx, bet_amount)
 
-class s_gamble(commands.Cog):
-    def __init__(self, bot) -> None:
-        self.bot = bot
-
     @slash_command(name="gamble", description="Gamble with your chips.", guild_ids=guild_ids)
-    async def gamble(self, ctx: ApplicationContext, chips: Option(int, "How many chips you want to gamble?", min_value=1)):
+    async def s_gamble(self, ctx: ApplicationContext, chips: Option(int, "How many chips you want to gamble?", min_value=1)):
         await gamble(ctx, chips)
 
 async def gamble(ctx: Optional[Union[Context, ApplicationContext]], bet_amount):
