@@ -14,9 +14,21 @@ seats = 10
 player_init = {}
 
 class Hit_Modal(Modal):
-    def __init__(self) -> None:
-        super().__init__("How many chips you want to shoot?")
+    def __init__(self, text) -> None:
+        super().__init__(text)
         self.add_item(InputText(label="chips", placeholder="chips", value="100", style=discord.InputTextStyle.short))
+    
+    async def callback(self, interaction: discord.Interaction):
+        try:
+            chips = int(self.children[0].value)
+            if chips < 1:
+                await interaction.response.send_message("You must input a positive integer!", view=LM_View(), ephemeral=True)
+            else:
+                guild_id = str(interaction.guild.id)
+                await interaction.response.send_message("success", ephemeral=True, delete_after=1)
+        except:
+            # await interaction.response.send_modal(Hit_Modal("123"))
+            await interaction.response.send_message("You must input a positive integer!", view=LM_View(), ephemeral=True)
 
 
 class LM_View(View):
@@ -24,7 +36,7 @@ class LM_View(View):
     async def hit_callback(self, button: discord.Button, interaction: discord.Interaction):
         channel_id = str(interaction.channel.id)
         # await interaction.response.send_message("Invalid command.", ephemeral=True)
-        await interaction.response.send_modal(Hit_Modal())
+        await interaction.response.send_modal(Hit_Modal("How many chips you want to shoot?"))
 
 async def game_task(channel, guild_id, m):
     if guild_id in game_records:
