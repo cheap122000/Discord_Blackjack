@@ -32,20 +32,21 @@ def store_to_processing(ctx: Optional[Union[Context, ApplicationContext]]):
     if is_in_processing(ctx) or not bot_is_ready:
         return False
     else:
-        processing_channel[str(ctx.channel.id)] = int(time.time())
+        # processing_channel[str(ctx.channel.id)] = int(time.time())
         processing_user[str(ctx.author.id)] = int(time.time())
         return True
 
 def delete_from_processing(ctx: Optional[Union[Context, ApplicationContext]]):
-    processing_channel.pop(str(ctx.channel.id))
+    # processing_channel.pop(str(ctx.channel.id))
     processing_user.pop(str(ctx.author.id))
 
 def is_in_processing(ctx: Optional[Union[Context, ApplicationContext]]):
-    p_time = processing_channel.get(str(ctx.channel.id))
     now_time = int(time.time())
-    if p_time:
-        if now_time - p_time < 30:
-            return True
+
+    # p_time = processing_channel.get(str(ctx.channel.id))
+    # if p_time:
+    #     if now_time - p_time < 30:
+    #         return True
     
     p_time = processing_user.get(str(ctx.author.id))
     if p_time:
