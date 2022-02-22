@@ -29,7 +29,8 @@ if not os.path.exists("./db_bj.db3"):
 @bot.event
 async def on_ready():
     tools.bot_is_ready = True
-    print(f"command bot is ready {bot.user}")
+    await bot.change_presence(activity=discord.Game(name="/help or bj!help"))
+    print(f"bot is ready, login as {bot.user}")
 
 # help
 @bot.command(name="help")
