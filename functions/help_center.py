@@ -12,7 +12,7 @@ class helpCenter():
         embed = discord.Embed()
         embed.colour = discord.Colour.purple()
         embed.set_author(name="NicoJack Help Center", icon_url="https://i.imgur.com/YFo8xQ1.jpg")
-        embed.add_field(name=":coin: Infos", value="`bj!p`,\n`bj!daily`", inline=True)
+        embed.add_field(name=":coin: Infos", value="`bj!p`, `bj!pool`,\n`bj!daily`", inline=True)
         embed.add_field(name=":coin: BlackJack", value="`bj!start`, `bj!join`,\n`bj!hit`, `bj!double`, `bj!stand`", inline=True)
         embed.add_field(name=":coin: Gamble", value="`bj!gamble`", inline=True)
 
@@ -34,7 +34,7 @@ class helpCenter():
             embed.colour = discord.Colour.purple()
             embed.set_author(name="NicoJack Help Center", icon_url="https://i.imgur.com/YFo8xQ1.jpg")
             embed.set_footer(text=f"{ctx.author.display_name}#{ctx.author.discriminator}. Use slash commands to play games eaily.", icon_url=ctx.author.display_avatar)
-            embed.add_field(name=":coin: Infos", value="`profile`, `daily`", inline=True)
+            embed.add_field(name=":coin: Infos", value="`profile`, `pool`\n`daily`", inline=True)
             embed.add_field(name=":coin: Balance", value="`give`", inline=True)
             embed.add_field(name=":coin: Gamble", value="`gamble`", inline=True)
             embed.add_field(name=":coin: BlackJack", value="`bj_start`, `bj_join`", inline=True)

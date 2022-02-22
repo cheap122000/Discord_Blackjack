@@ -120,7 +120,7 @@ async def step(record):
     time_left = 0 if time_left < 0 else time_left
     embed = discord.Embed()
     embed.type = "rich"
-    embed.set_author(name="A game is started! Use command \"bj!join\" to join this game. ")
+    embed.set_author(name="A game is started! Use command `bj!join` or `/bj_join` to join this game. ")
     embed.set_footer(text=f"The game will start in {time_left} second(s).")
     embed.colour = discord.Colour.orange() 
 

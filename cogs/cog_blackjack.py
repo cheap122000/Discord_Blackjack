@@ -45,7 +45,7 @@ async def start(ctx: Optional[Union[Context, ApplicationContext]]):
         else:
             embed = discord.Embed()
             embed.type = "rich"
-            embed.set_author(name="A game is started! Use command \"!join\" to join this game. ")
+            embed.set_author(name="A game is started! Use command `bj!join` or `/bj_join` to join this game. ")
             embed.set_footer(text=f"The game will start in {blackjack.turn_count} second(s).")
 
             await send_message(ctx, "OK", ephemeral=True)
