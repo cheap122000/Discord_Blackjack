@@ -1,3 +1,6 @@
+from urllib import response
+
+from async_timeout import timeout
 from .game_config import *
 import asyncio
 import time
@@ -8,15 +11,17 @@ from discord.ui import Button, View, button, Modal, InputText
 from discord import ButtonStyle
 
 game_records = {}
-turn_count = 30
+turn_count = 10
+hit_count = 20
 seats = 10
+end_step = 4
 
 player_init = {}
 
 class Hit_Modal(Modal):
     def __init__(self, text) -> None:
         super().__init__(text)
-        self.add_item(InputText(label="chips", placeholder="chips", value="100", style=discord.InputTextStyle.short))
+        self.add_item(InputText(label="chips :coin:", placeholder="chips", value="100", style=discord.InputTextStyle.short))
     
     async def callback(self, interaction: discord.Interaction):
         try:
@@ -25,7 +30,9 @@ class Hit_Modal(Modal):
                 await interaction.response.send_message("You must input a positive integer!", view=LM_View(), ephemeral=True)
             else:
                 guild_id = str(interaction.guild.id)
-                await interaction.response.send_message("success", ephemeral=True, delete_after=1)
+                print(chips)
+                # await interaction.response.edit_message(content="")
+                await interaction.response.send_message(f"{chips}", ephemeral=True)
         except:
             # await interaction.response.send_modal(Hit_Modal("123"))
             await interaction.response.send_message("You must input a positive integer!", view=LM_View(), ephemeral=True)
@@ -38,22 +45,52 @@ class LM_View(View):
         if game_records.get(guild_id):
             turn = game_records[guild_id]["turn"]
             if game_records[guild_id]["step"] != 2 or game_records[guild_id]["players"][turn]["user_id"] != interaction.user.id:
-                await interaction.response.send_message(f"Not your turn.", delete_after=1, ephemeral=True)
+                await interaction.response.send_message(f"Not your turn.", delete_after=1)
                 return
             else:
                 cards, points = show_cards(game_records[guild_id]["players"][turn], force_show=True)
                 if len(game_records[guild_id]['players'][turn]["cards"]) < 3:
-                    await interaction.response.send_message(f"Your card is {cards}.\nWhat do you want to do?", ephemeral=True)
+                    if deck_of_card[game_records[guild_id]['players'][turn]["cards"][0]]["r_number"] != deck_of_card[game_records[guild_id]['players'][turn]["cards"][1]]["r_number"]:
+                        await interaction.response.send_message(f"Your card is {cards}.\nWhat do you want to do?", ephemeral=True, view=LM_Card_In_View())
+                    else:
+                        await interaction.response.send_message(f"Your card is {cards}.\nWhat do you want to do?", ephemeral=True, view=LM_Card_UD_View())
                 else:
                     await interaction.response.send_message("Invalid command.", delete_after=1, ephemeral=True)
         else:
             await interaction.response.send_message(f"Use command `/lm_start` or `bj!lm_start` to create a game first.", delete_after=1)
 
-    @button(label="Hit", style=ButtonStyle.green, emoji="✋")
-    async def hit_callback(self, button: discord.Button, interaction: discord.Interaction):
+class LM_Card_In_View(View):
+    def __init__(self) -> None:
+        super().__init__(timeout=20)
+
+    @button(label="In", style=ButtonStyle.green, emoji="🥅")
+    async def in_callback(self, button: discord.Button, interaction: discord.Interaction):
         guild_id = str(interaction.guild.id)
         # await interaction.response.send_message("Invalid command.", ephemeral=True)
-        await interaction.response.send_modal(Hit_Modal("How many chips you want to shoot?"))
+        await interaction.response.send_modal(Hit_Modal("How many chips :coin: you want to shoot?"))
+        # self.stop()
+        
+        
+    @button(label="Stand", style=ButtonStyle.red, emoji="🛑")
+    async def stand_callback(self, button: discord.Button, interaction: discord.Interaction):
+        guild_id = str(interaction.guild.id)
+        await interaction.response.send_message("OK", ephemeral=True, delete_after=1)
+
+    # async def on_timeout(self) -> None:
+    #     await 
+
+class LM_Card_UD_View(View):
+    @button(label="Big", style=ButtonStyle.green, emoji="🔼")
+    async def big_callback(self, button: discord.Button, interaction: discord.Interaction):
+        guild_id = str(interaction.guild.id)
+        # await interaction.response.send_message("Invalid command.", ephemeral=True)
+        await interaction.response.send_modal(Hit_Modal("How many chips :coin: you want to shoot?"))
+
+    @button(label="Small", style=ButtonStyle.primary, emoji="🔽")
+    async def small_callback(self, button: discord.Button, interaction: discord.Interaction):
+        guild_id = str(interaction.guild.id)
+        # await interaction.response.send_message("Invalid command.", ephemeral=True)
+        await interaction.response.send_modal(Hit_Modal("How many chips :coin: you want to shoot?"))
 
     @button(label="Stand", style=ButtonStyle.red, emoji="🛑")
     async def stand_callback(self, button: discord.Button, interaction: discord.Interaction):
@@ -113,7 +150,7 @@ async def step1(record):
     embed.add_field(name="Prize Pool", value=f"{prize} :coin:", inline=False)
 
     if n_players == 0:
-        record["step"] = 5
+        record["step"] = end_step
         return
     
     for i, item in enumerate(record["players"]):
@@ -154,11 +191,43 @@ async def step1(record):
 async def step2(record):
     await record["message"].edit(view=LM_View())
 
+    for i, p in enumerate(record["players"]):
+        record['turn'] = i
+        cards, points = show_cards(p)
+
+        record["message"].embeds[0].set_field_at(i+1, name=f":point_right: {record['players'][i]['user_name']}", value=f"chips: {record['players'][i]['bet_amount']} :coin:\ncards: {cards}", inline=False)
+        await record["message"].edit(embed=record["message"].embeds[0], content=f"{p['user_name']}'s turn.")
+
+        record['start_time'] = int(time.time())
+        while True:
+            if record["players"][i]["revealed"]:
+                time_left = 5 - (int(time.time()) - record['start_time'])
+                msg = f"<@!{record['players'][i]['user_id']}>'s turn is over.Left {time_left} second(s) for next player."
+            else:
+                time_left = hit_count - (int(time.time()) - record['start_time'])
+                msg = f"<@!{record['players'][i]['user_id']}>'s turn.\nClick \"Show card\" to see your cards.\nYou left {time_left} second(s)."
+
+            await record["message"].edit(content=msg)            
+                
+            record["message"].embeds[0].set_field_at(i+1, name=f":point_right: {record['players'][i]['user_name']}", value=f"chips: {record['players'][i]['bet_amount']} :coin:\ncards: {cards}", inline=False)
+            # await record["message"].edit(embed=record["message"].embeds[0], content=f"{record['players'][i]['user_name']}'s turn.")
+            await record["message"].edit(embed=record["message"].embeds[0])
+
+            await asyncio.sleep(0.8)
+            if time_left < 0:
+                record["message"].embeds[0].set_field_at(i+1, name=f"{record['players'][i]['user_name']}", value=f"chips: {record['players'][i]['bet_amount']} :coin:\ncards: {cards}", inline=False)
+                await record["message"].edit(embed=record["message"].embeds[0])
+                break
+    record["step"] += 1
+
 def show_cards(player, force_show=False):
     now_cards = ""
-    for card in player["cards"]:
+    for i, card in enumerate(player["cards"]):
         if player["revealed"] or force_show:
-            now_cards += f"|:{deck_of_card[card]['suit']}:{deck_of_card[card]['number']}| "
+            if i < 2:
+                now_cards += f"|:{deck_of_card[card]['suit']}:{deck_of_card[card]['number']}| "
+            else:
+                now_cards += f"\nshoot: |:{deck_of_card[card]['suit']}:{deck_of_card[card]['number']}| "
         else:
             now_cards += "|:question:| "
 

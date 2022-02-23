@@ -9,6 +9,7 @@ from discord import ButtonStyle
 
 game_records = {}
 turn_count = 30
+hit_count = 20
 
 class BJ_View(View):
     @button(label="Hit", style=ButtonStyle.green, emoji="✋")
@@ -367,7 +368,7 @@ async def step4(record):
             all_balance += f"<@!{item}> won {temp[item]['profit']} :coin:, now have {b} :coin:\n"
         else:
             b = db.get_balance(item, int(temp[item]['balance']))
-            all_balance += f"<@!{item}> lost {temp[item]['profit']} :coin:, now have {b} :coin:\n"    
+            all_balance += f"<@!{item}> lost {temp[item]['profit']*-1} :coin:, now have {b} :coin:\n"    
     db.close()
     await record["message"].edit(view=None)
     await record["message"].channel.send(embed=embed, content=f"Result:\n{all_balance}")
