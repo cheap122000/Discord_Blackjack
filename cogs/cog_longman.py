@@ -67,7 +67,7 @@ async def join(ctx: Optional[Union[Context, ApplicationContext]]):
                     delete_from_processing(ctx)
                     return
                 db.close()
-                longman.game_records[guild_id]["players"].append({"user_id": ctx.author.id, "user_name": ctx.author.display_name, "bet_amount": 0, "cards": [], "result": None})
+                longman.game_records[guild_id]["players"].append({"user_id": ctx.author.id, "user_name": ctx.author.display_name, "bet_amount": 0, "cards": [], "revealed": False, "result": None})
             else:
                 await reply_message(ctx, "The max limit for a game is 10 players. Please wait for the next game.")
         else:

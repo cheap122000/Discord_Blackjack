@@ -46,6 +46,6 @@ bot.add_cog(cog_profile.Profile(bot))
 bot.add_cog(cog_blackjack.BJGame(bot))
 bot.add_cog(cog_gamble.GambleGame(bot))
 bot.add_cog(cog_balance.Balance(bot))
-# bot.add_cog(cog_longman.LongMan(bot))
+bot.add_cog(cog_longman.LongMan(bot))
 
 bot.run(token)
