@@ -40,8 +40,13 @@ async def gamble(ctx: Optional[Union[Context, ApplicationContext]], bet_amount):
         if success:
             num = random.randint(1, 100)
             if num <= 60:
+                prize = db.add_to_pool(ctx.guild.id, bet_amount)
                 embed.colour = discord.Colour.red()
                 embed.set_author(name=f"{ctx.author.display_name} rolled {num}, lost {bet_amount} Nicoins. Now have {balance} Nicoins", icon_url=ctx.author.display_avatar)
+                if ctx.guild.icon:
+                    embed.set_footer(text=f"This server's prize pool has {prize} Nicoins.", icon_url=ctx.guild.icon.url)
+                else:
+                    embed.set_footer(text=f"This server's prize pool has {prize} Nicoins.")
             elif num <= 97:
                 balance = db.get_balance(ctx.author.id, bet_amount*2)
                 embed.colour = discord.Colour.green()

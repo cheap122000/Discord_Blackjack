@@ -90,6 +90,17 @@ class DB:
         else:
             return False, 0
 
+    def add_to_pool(self, guild_id, bet_amount):
+        rows = self.query_data(f"SELECT * FROM [pools] WHERE [guild_id]='{guild_id}'")
+
+        if len(rows):
+            prize = int(rows[0][2]) + bet_amount
+            self.operate_db(f"UPDATE [pools] SET [prize]='{prize}' WHERE [guild_id]='{guild_id}'")
+            return prize
+        else:
+            self.operate_db(f"INSERT INTO [pools] ([guild_id], [prize]) VALUES ('{guild_id}', '{bet_amount}')")
+            return bet_amount
+
     def get_balance(self, dc_id, bet_amount):
         rows = self.query_data(f"SELECT * FROM [users] WHERE [dc_id]='{dc_id}'")
 
