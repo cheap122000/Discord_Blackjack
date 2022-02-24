@@ -110,6 +110,13 @@ class DB:
         else:
             self.operate_db(f"INSERT INTO [pools] ([guild_id], [prize]) VALUES ('{guild_id}', '0')")
             return 0
+
+    def save_guild_pool(self, guild_id, prize):
+        rows = self.query_data(f"SELECT * FROM [pools] WHERE [guild_id]='{guild_id}'")
+        if len(rows):
+            self.operate_db(f"UPDATE [pools] SET [prize]='{prize}' WHERE [guild_id]='{guild_id}'")
+        else:
+            self.operate_db(f"INSERT INTO [pools] ([guild_id], [prize]) VALUES ('{guild_id}', '0')")
     
     def check_time(self):
         query_time = int(time.time()) - 60

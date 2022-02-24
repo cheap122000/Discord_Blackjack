@@ -23,7 +23,7 @@ class LongMan(commands.Cog):
     async def s_lm_start(self, ctx: ApplicationContext):
         await start(ctx)
 
-    @commands.slash_command(name="lm_join", description="Join a LongMan Game.", guild_ids=guild_ids)
+    @commands.slash_command(name="lm_join", description="Join a LongMan Game with 100 Nicoins.", guild_ids=guild_ids)
     async def s_lm_join(self, ctx: Context):
         await join(ctx)
 
@@ -67,7 +67,7 @@ async def join(ctx: Optional[Union[Context, ApplicationContext]]):
                     delete_from_processing(ctx)
                     return
                 db.close()
-                longman.game_records[guild_id]["players"].append({"user_id": ctx.author.id, "user_name": ctx.author.display_name, "bet_amount": 0, "cards": [], "revealed": False, "result": None})
+                longman.game_records[guild_id]["players"].append({"user_id": ctx.author.id, "user_name": ctx.author.display_name, "bet_amount": 0, "bet": "", "cards": [], "revealed": False, "result": None})
             else:
                 await reply_message(ctx, "The max limit for a game is 10 players. Please wait for the next game.")
         else:

@@ -38,6 +38,7 @@ class helpCenter():
             embed.add_field(name=":coin: Balance", value="`give`", inline=True)
             embed.add_field(name=":coin: Gamble", value="`gamble`", inline=True)
             embed.add_field(name=":coin: BlackJack", value="`bj_start`, `bj_join`", inline=True)
+            embed.add_field(name=":coin: LongMan", value="`lm_start`, `lm_join`", inline=True)
 
             return embed
         else:
