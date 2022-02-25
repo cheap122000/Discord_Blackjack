@@ -138,7 +138,7 @@ async def get_rank(ctx: Optional[Union[Context, ApplicationContext]], query_str:
             # user = await tools.bot.fetch_user(row[1])
             user = await ctx.guild.fetch_member(row[1])
             temp = {}
-            temp["user_name"] = f"{user.nick}#{user.discriminator}"
+            temp["user_name"] = f"{user.display_name}#{user.discriminator}"
             temp["user_avatar"] = user.display_avatar
             temp["balance"] = row[2]
             users.append(temp)
