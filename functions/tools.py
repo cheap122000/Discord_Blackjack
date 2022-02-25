@@ -1,3 +1,4 @@
+import discord
 from .db_game import DB
 from discord.ext.commands import Bot
 import time
@@ -6,6 +7,8 @@ from discord.ext.commands.context import Context
 from discord.commands.context import ApplicationContext
 import asyncio
 import json
+
+bot = Bot(command_prefix="bj!", intents=discord.Intents.all())
 
 processing_channel = {}
 processing_user = {}

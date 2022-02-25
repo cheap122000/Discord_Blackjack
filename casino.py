@@ -15,9 +15,10 @@ from cogs import cog_profile, cog_blackjack, cog_gamble, cog_balance, cog_longma
 
 token = tools.token
 
-intents = discord.Intents.all()
+# intents = discord.Intents.all()
+# bot = commands.Bot(command_prefix="bj!", intents=intents)
 
-bot = commands.Bot(command_prefix="bj!", intents=intents)
+bot = tools.bot
 bot.remove_command("help")
 
 hpc = help_center.helpCenter()

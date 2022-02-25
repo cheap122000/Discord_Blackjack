@@ -1,10 +1,12 @@
 import discord
 from discord.ext import commands
+from discord.commands import Option
 from discord.ext.commands.context import Context
 from discord.commands.context import ApplicationContext
 from functions.tools import guild_ids, send_message
 from functions import profile, tools, db_game
 from typing import Optional, Union, Tuple
+from datetime import datetime
 
 class Profile(commands.Cog):
     def __init__(self, bot) -> None:
@@ -69,6 +71,10 @@ class Profile(commands.Cog):
     async def s_pool(self, ctx: ApplicationContext):
         await get_guild_pool(ctx)
 
+    @commands.slash_command(name="leader_board", description="Look the rank in this server or global.", guild_ids=guild_ids)
+    async def s_lb(self, ctx: ApplicationContext, scope: Option(str, "Choose the scope", choices=["This server", "Global"])):
+        await rank(ctx, scope)
+
 async def get_guild_pool(ctx: Optional[Union[Context, ApplicationContext]]):
     db = db_game.DB()
     prize = db.query_guild_pool(ctx.guild.id)
@@ -80,3 +86,71 @@ async def get_guild_pool(ctx: Optional[Union[Context, ApplicationContext]]):
     else:
         embed.set_author(name=f"This server's prize pool has {prize} Nicoins.")
     await send_message(ctx, embed=embed)
+
+async def rank(ctx: Optional[Union[Context, ApplicationContext]], scope: str):
+    embed = discord.Embed()
+    embed.colour = discord.Colour.gold()
+
+    if scope == "This server":
+        ids = [str(member.id) for member in ctx.guild.members]
+        query_str = "','".join(ids)
+        rank = await get_rank(query_str)
+        if ctx.guild.icon:
+            embed.set_author(name="Server's Leader Board", icon_url=ctx.guild.icon.url)
+        else:
+            embed.set_author(name="Server's Leader Board")
+        
+    else:
+        rank = await get_rank()
+        embed.set_author(name="Global Leader Board")
+
+    for i, r in enumerate(rank):
+        if i == 0:
+            embed.add_field(name=f":first_place: {r['user_name']}", value=f"{r['balance']} :coin:", inline=False)
+        elif i == 1:
+            embed.add_field(name=f":second_place: {r['user_name']}", value=f"{r['balance']} :coin:", inline=False)
+        elif i == 2:
+            embed.add_field(name=f":third_place: {r['user_name']}", value=f"{r['balance']} :coin:", inline=False)
+        elif i == 3:
+            embed.add_field(name=f":four: {r['user_name']}", value=f"{r['balance']} :coin:", inline=False)
+        elif i == 4:
+            embed.add_field(name=f":five: {r['user_name']}", value=f"{r['balance']} :coin:", inline=False)
+        elif i == 5:
+            embed.add_field(name=f":six: {r['user_name']}", value=f"{r['balance']} :coin:", inline=False)
+        elif i == 6:
+            embed.add_field(name=f":seven: {r['user_name']}", value=f"{r['balance']} :coin:", inline=False)
+        elif i == 7:
+            embed.add_field(name=f":eight: {r['user_name']}", value=f"{r['balance']} :coin:", inline=False)
+        elif i == 8:
+            embed.add_field(name=f":nine: {r['user_name']}", value=f"{r['balance']} :coin:", inline=False)
+        elif i == 9:
+            embed.add_field(name=f":keycap_ten: {r['user_name']}", value=f"{r['balance']} :coin:", inline=False)
+
+    embed.set_footer(text=f"Created at {datetime.now().strftime('%Y/%m/%d %H:%M:%S')}")
+    await send_message(ctx, embed=embed)
+
+async def get_rank(query_str: str=None) -> list:
+    db = db_game.DB()
+    if query_str:
+        rows = db.query_data(f"SELECT * FROM [users] WHERE [dc_id] in ('{query_str}') ORDER BY [currency] DESC LIMIT 5")
+        users = []
+        for row in rows:
+            user = await tools.bot.fetch_user(row[1])
+            temp = {}
+            temp["user_name"] = f"{user.name}#{user.discriminator}"
+            temp["user_avatar"] = user.display_avatar
+            temp["balance"] = row[2]
+            users.append(temp)
+    
+    else:
+        rows = db.query_data(f"SELECT * FROM [users] ORDER BY [currency] DESC LIMIT 10")
+        users = []
+        for row in rows:
+            user = await tools.bot.fetch_user(row[1])
+            temp = {}
+            temp["user_name"] = f"{user.name}#{user.discriminator}"
+            temp["user_avatar"] = user.display_avatar
+            temp["balance"] = row[2]
+            users.append(temp)
+    db.close()
+    return users

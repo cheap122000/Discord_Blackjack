@@ -15,6 +15,7 @@ class helpCenter():
         embed.add_field(name=":coin: Infos", value="`bj!p`, `bj!pool`,\n`bj!daily`", inline=True)
         embed.add_field(name=":coin: BlackJack", value="`bj!start`, `bj!join`,\n`bj!hit`, `bj!double`, `bj!stand`", inline=True)
         embed.add_field(name=":coin: Gamble", value="`bj!gamble`", inline=True)
+        embed.add_field(name=":coin: LongMan", value="`bj!lm_start`, `bj!lm_join`", inline=True)
 
         return embed
 
@@ -34,7 +35,7 @@ class helpCenter():
             embed.colour = discord.Colour.purple()
             embed.set_author(name="NicoJack Help Center", icon_url="https://i.imgur.com/YFo8xQ1.jpg")
             embed.set_footer(text=f"{ctx.author.display_name}#{ctx.author.discriminator}. Use slash commands to play games eaily.", icon_url=ctx.author.display_avatar)
-            embed.add_field(name=":coin: Infos", value="`profile`, `pool`\n`daily`", inline=True)
+            embed.add_field(name=":coin: Infos", value="`profile`, `pool`\n`daily`, `leader_board`", inline=True)
             embed.add_field(name=":coin: Balance", value="`give`", inline=True)
             embed.add_field(name=":coin: Gamble", value="`gamble`", inline=True)
             embed.add_field(name=":coin: BlackJack", value="`bj_start`, `bj_join`", inline=True)
@@ -90,4 +91,12 @@ class helpCenter():
                     self.help_command.set_field_at(0, name="`bj!stand`", value="Stand and turn to the next player", inline=False)
                     self.help_command.set_field_at(1, name="Category", value="BlackJack", inline=False)
                     self.help_command.set_field_at(2, name="Method", value="`bj!stand`", inline=False)
+                elif commands[1] in ["lm_start", "bj!lm_start"]:
+                    self.help_command.set_field_at(0, name="`bj!lm_start`", value="Start a LongMan game", inline=False)
+                    self.help_command.set_field_at(1, name="Category", value="BlackJack", inline=False)
+                    self.help_command.set_field_at(2, name="Method", value="`bj!lm_start`", inline=False)
+                elif commands[1] in ["lm_join", "bj!lm_join"]:
+                    self.help_command.set_field_at(0, name="`bj!lm_join`", value="Join a LongMan Game in the server.", inline=False)
+                    self.help_command.set_field_at(1, name="Category", value="BlackJack", inline=False)
+                    self.help_command.set_field_at(2, name="Method", value="`bj!lm_join`", inline=False)
                 return self.help_command
