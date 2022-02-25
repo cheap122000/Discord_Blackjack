@@ -8,7 +8,7 @@ import discord
 import random
 from functions.db_game import DB
 from discord.ui import Button, View, button, Modal, InputText
-from discord import ButtonStyle
+from discord import ButtonStyle, Embed
 
 game_records = {}
 turn_count = 30
@@ -336,6 +336,11 @@ async def step2(record):
                 break
 
         if record['prize'] == 0:
+            Embed = discord.Embed()
+            if record["message"].guild.icon:
+                embed.set_author(name=f"This server's prize pool has {prize} Nicoins.", icon_url=ctx.guild.icon.url)
+            else:
+                embed.set_author(name=f"This server's prize pool has {prize} Nicoins.")
             await record["message"].channel.send(f"The server's prize pool is empty.")
             break
 
