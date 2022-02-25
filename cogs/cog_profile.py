@@ -94,14 +94,14 @@ async def rank(ctx: Optional[Union[Context, ApplicationContext]], scope: str):
     if scope == "This server":
         ids = [str(member.id) for member in ctx.guild.members]
         query_str = "','".join(ids)
-        rank = await get_rank(query_str)
+        rank = await get_rank(ctx, query_str)
         if ctx.guild.icon:
             embed.set_author(name="Server's Leader Board", icon_url=ctx.guild.icon.url)
         else:
             embed.set_author(name="Server's Leader Board")
         
     else:
-        rank = await get_rank()
+        rank = await get_rank(ctx)
         embed.set_author(name="Global Leader Board")
 
     for i, r in enumerate(rank):
@@ -129,15 +129,16 @@ async def rank(ctx: Optional[Union[Context, ApplicationContext]], scope: str):
     embed.set_footer(text=f"Created at {datetime.now().strftime('%Y/%m/%d %H:%M:%S')}")
     await send_message(ctx, embed=embed)
 
-async def get_rank(query_str: str=None) -> list:
+async def get_rank(ctx: Optional[Union[Context, ApplicationContext]], query_str: str=None) -> list:
     db = db_game.DB()
     if query_str:
         rows = db.query_data(f"SELECT * FROM [users] WHERE [dc_id] in ('{query_str}') ORDER BY [currency] DESC LIMIT 5")
         users = []
         for row in rows:
-            user = await tools.bot.fetch_user(row[1])
+            # user = await tools.bot.fetch_user(row[1])
+            user = await ctx.guild.fetch_member(row[1])
             temp = {}
-            temp["user_name"] = f"{user.name}#{user.discriminator}"
+            temp["user_name"] = f"{user.nick}#{user.discriminator}"
             temp["user_avatar"] = user.display_avatar
             temp["balance"] = row[2]
             users.append(temp)
