@@ -43,7 +43,10 @@ class Hit_Modal(Modal):
         turn = game_records[guild_id]["turn"]
 
         if game_records[guild_id]["step"] != 2 or game_records[guild_id]["players"][turn]["user_id"] != interaction.user.id:
-            await interaction.response.send_message(f"Not your turn.", delete_after=5)
+            await interaction.response.send_message(f"Not your turn.", delete_after=3)
+            return
+        elif len(game_records[guild_id]["players"][turn]["cards"]) > 2:
+            await interaction.response.send_message(f"Invalid command!", delete_after=3)
             return
         else:
             if self.act == "in":
@@ -81,7 +84,7 @@ class Hit_Modal(Modal):
                 b = db.get_balance(interaction.user.id, chips*-3)
                 msg += f"\n{game_records[guild_id]['players'][turn]['user_name']} lost {chips} :coin:, now has {b} :coin:" 
             db.close()
-            await interaction.response.send_message(msg)
+            await interaction.response.send_message(msg, delete_after=4)
         # self.view.stop()
 
 
@@ -135,13 +138,16 @@ class LM_Card_In_View(View):
         if game_records[guild_id]["step"] != 2 or game_records[guild_id]["players"][turn]["user_id"] != interaction.user.id:
             await interaction.response.send_message(f"Not your turn.", delete_after=2)
             return
+        elif len(game_records[guild_id]["players"][turn]["cards"]) > 2:
+            await interaction.response.send_message(f"Invalid command!", delete_after=2)
+            return
 
         turn = game_records[guild_id]["turn"]
         game_records[guild_id]['players'][turn]["cards"].append(-1)
         game_records[guild_id]['players'][turn]['revealed'] = True
         cards, result = show_cards(game_records[guild_id]['players'][turn])
         msg = f"<@!{game_records[guild_id]['players'][turn]['user_id']}> stood!\nchips: 0 :coin:\ncards: {cards}"
-        await interaction.response.send_message(content=msg)
+        await interaction.response.send_message(content=msg, delete_after=4)
 
 class LM_Card_UD_View(View):
     @button(label="Big", style=ButtonStyle.green, emoji="🔼")
@@ -182,13 +188,16 @@ class LM_Card_UD_View(View):
         if game_records[guild_id]["step"] != 2 or game_records[guild_id]["players"][turn]["user_id"] != interaction.user.id:
             await interaction.response.send_message(f"Not your turn.", delete_after=2)
             return
+        elif len(game_records[guild_id]["players"][turn]["cards"]) > 2:
+            await interaction.response.send_message(f"Invalid command!", delete_after=2)
+            return
 
         turn = game_records[guild_id]["turn"]
         game_records[guild_id]['players'][turn]["cards"].append(-1)
         game_records[guild_id]['players'][turn]['revealed'] = True
         cards, result = show_cards(game_records[guild_id]['players'][turn])
         msg = f"<@!{game_records[guild_id]['players'][turn]['user_id']}> stood!\nchips: 0 :coin:\ncards: {cards}"
-        await interaction.response.send_message(content=msg)
+        await interaction.response.send_message(content=msg, delete_after=4)
 
 async def game_task(channel, guild_id, m):
     if guild_id in game_records:
@@ -336,12 +345,14 @@ async def step2(record):
                 break
 
         if record['prize'] == 0:
-            Embed = discord.Embed()
+            embed = discord.Embed()
+            embed.colour = discord.Colour.red()
             if record["message"].guild.icon:
-                embed.set_author(name=f"This server's prize pool has {prize} Nicoins.", icon_url=ctx.guild.icon.url)
+                embed.set_author(name=f"The server's prize pool is empty.", icon_url=record["message"].guild.icon.url)
             else:
-                embed.set_author(name=f"This server's prize pool has {prize} Nicoins.")
-            await record["message"].channel.send(f"The server's prize pool is empty.")
+                embed.set_author(name=f"The server's prize pool is empty.")
+            # await record["message"].channel.send(f"The server's prize pool is empty.")
+            await record["message"].channel.send(embed=embed)
             break
 
     await record["message2"].delete()

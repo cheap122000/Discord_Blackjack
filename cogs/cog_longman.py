@@ -60,14 +60,16 @@ async def join(ctx: Optional[Union[Context, ApplicationContext]]):
                 success, balance, prize = db.bet_to_pool(ctx.author.id, ctx.guild.id, 100)
                 if success:
                     longman.game_records[guild_id]["prize"] = prize
+                    delete_from_processing(ctx)
                     await reply_message(ctx, f"You joined the game, now you left {balance} Nicoins.")
+                    db.close()
+                    longman.game_records[guild_id]["players"].append({"user_id": ctx.author.id, "user_name": ctx.author.display_name, "bet_amount": 0, "bet": "", "cards": [], "revealed": False, "result": None})
+                    return
                 else:
                     await reply_message(ctx, f"You should have at least 100 :coin: to join LongMan. Your Nicoins: {balance}")
                     db.close()
                     delete_from_processing(ctx)
                     return
-                db.close()
-                longman.game_records[guild_id]["players"].append({"user_id": ctx.author.id, "user_name": ctx.author.display_name, "bet_amount": 0, "bet": "", "cards": [], "revealed": False, "result": None})
             else:
                 await reply_message(ctx, "The max limit for a game is 10 players. Please wait for the next game.")
         else:
