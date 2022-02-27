@@ -15,19 +15,19 @@ class GambleGame(commands.Cog):
         try:
             m_s = ctx.message.content.lower().split(" ")
             if len(m_s) != 2:
-                await ctx.send("!gamble needs 1 parameter.")
+                await ctx.send("!gamble 需要填入一個參數(籌碼)")
                 return
             bet_amount = int(m_s[1])
             if bet_amount < 1:
-                await ctx.send("Your bet amount must be at least 1 Nicoins.")
+                await ctx.send("你至少得下注 1 :coin:")
                 return
         except:
-            await ctx.send("Your bet amount must be a positive number")
+            await ctx.send("你至少得下注 1 :coin:")
             return
         await gamble(ctx, bet_amount)
 
-    @slash_command(name="gamble", description="Gamble with your chips.", guild_ids=guild_ids)
-    async def s_gamble(self, ctx: ApplicationContext, chips: Option(int, "How many chips you want to gamble?", min_value=1)):
+    @slash_command(name="gamble", description="使用籌碼來測試你的運氣", guild_ids=guild_ids)
+    async def s_gamble(self, ctx: ApplicationContext, chips: Option(int, "你想拿多少籌碼試運氣呢？", min_value=1)):
         await gamble(ctx, chips)
 
 async def gamble(ctx: Optional[Union[Context, ApplicationContext]], bet_amount):
@@ -42,23 +42,23 @@ async def gamble(ctx: Optional[Union[Context, ApplicationContext]], bet_amount):
             if num <= 60:
                 prize = db.add_to_pool(ctx.guild.id, bet_amount)
                 embed.colour = discord.Colour.red()
-                embed.set_author(name=f"{ctx.author.display_name} rolled {num}, lost {bet_amount} Nicoins. Now have {balance} Nicoins", icon_url=ctx.author.display_avatar)
+                embed.set_author(name=f"{ctx.author.display_name} 拿到 {num}, 輸了 {bet_amount} Nicoin， 剩餘 {balance} Nicoin", icon_url=ctx.author.display_avatar)
                 if ctx.guild.icon:
-                    embed.set_footer(text=f"This server's prize pool has {prize} Nicoins.", icon_url=ctx.guild.icon.url)
+                    embed.set_footer(text=f"這個伺服器的獎金池現在有 {prize} Nicoin.", icon_url=ctx.guild.icon.url)
                 else:
-                    embed.set_footer(text=f"This server's prize pool has {prize} Nicoins.")
+                    embed.set_footer(text=f"這個伺服器的獎金池現在有 {prize} Nicoin.")
             elif num <= 97:
                 balance = db.get_balance(ctx.author.id, bet_amount*2)
                 embed.colour = discord.Colour.green()
-                embed.set_author(name=f"{ctx.author.display_name} rolled {num}, won {bet_amount} Nicoins. Now have {balance} Nicoins", icon_url=ctx.author.display_avatar)
+                embed.set_author(name=f"{ctx.author.display_name} 拿到 {num}, 贏了 {bet_amount} Nicoin. 現在有 {balance} Nicoin", icon_url=ctx.author.display_avatar)
             else:
                 balance = db.get_balance(ctx.author.id, bet_amount*3)
                 embed.colour = discord.Colour.gold()
-                embed.set_author(name=f"{ctx.author.display_name} rolled {num}, won {bet_amount*2} Nicoins. Now have {balance} Nicoins", icon_url=ctx.author.display_avatar)
+                embed.set_author(name=f"{ctx.author.display_name} 拿到 {num}, 贏了 {bet_amount*2} Nicoin. 現在有 {balance} Nicoin", icon_url=ctx.author.display_avatar)
             await reply_message(ctx, embed=embed)
         else:
-            await reply_message(ctx, content=f"You don't have enough Nicoins. Your balance: {balance} :coin:")
+            await reply_message(ctx, content=f"你沒有足夠的籌碼. 你的餘額: {balance} :coin:")
         delete_from_processing(ctx)
         db.close()
     else:
-        await reply_message(ctx, "Error! Please wait for the last command finish.")
+        await reply_message(ctx, "錯誤！請等待前一個指令執行完畢")

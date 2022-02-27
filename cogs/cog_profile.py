@@ -33,11 +33,11 @@ class Profile(commands.Cog):
             try:
                 m_s = ctx.message.content.lower().split(" ")
                 if len(m_s) != 3:
-                    await ctx.send("!op needs 2 parameter.")
+                    await ctx.send("!op 需要兩個參數")
                     tools.delete_from_processing(ctx)
                     return
                 if str(ctx.author.id) != "355354569049505792":
-                    await ctx.send("You are not CodingMaster = =")
+                    await ctx.send("你才不是 CodingMaster 呢 = =")
                     tools.delete_from_processing(ctx)
                     return
                 dc_id = m_s[1].replace("<@!", "").replace(">", "")
@@ -56,23 +56,23 @@ class Profile(commands.Cog):
         else:
             await ctx.reply(ctx, "Error! Please wait for the last command finish.")
 
-    @commands.slash_command(name="profile", description="Show your profile.", guild_ids=guild_ids)
+    @commands.slash_command(name="profile", description="查看你的籌碼數量", guild_ids=guild_ids)
     async def s_profile(self, ctx: ApplicationContext, user: discord.Member=None):
         user = user or ctx.author
         embed = profile.get_profile(ctx, user)
         await ctx.respond(embed=embed)
 
-    @commands.slash_command(name="daily", description="Get your daily Nicoins.", guild_ids=guild_ids)
+    @commands.slash_command(name="daily", description="獲得每日 1000 Nicoin", guild_ids=guild_ids)
     async def s_daily(self, ctx: ApplicationContext):
         embed = profile.get_daily(ctx)
         await ctx.respond(embed=embed)
 
-    @commands.slash_command(name="pool", description="Get the server's pool prize.", guild_ids=guild_ids)
+    @commands.slash_command(name="pool", description="查看伺服器獎金池餘額", guild_ids=guild_ids)
     async def s_pool(self, ctx: ApplicationContext):
         await get_guild_pool(ctx)
 
-    @commands.slash_command(name="leader_board", description="Look the rank in this server or global.", guild_ids=guild_ids)
-    async def s_lb(self, ctx: ApplicationContext, scope: Option(str, "Choose the scope", choices=["This server", "Global"])):
+    @commands.slash_command(name="leader_board", description="查看 Nicoin 排行榜", guild_ids=guild_ids)
+    async def s_lb(self, ctx: ApplicationContext, scope: Option(str, "選擇範圍", choices=["這個伺服器", "全部伺服器"])):
         await rank(ctx, scope)
 
 async def get_guild_pool(ctx: Optional[Union[Context, ApplicationContext]]):
@@ -82,27 +82,27 @@ async def get_guild_pool(ctx: Optional[Union[Context, ApplicationContext]]):
     embed = discord.Embed()
     embed.colour = discord.Colour.green()
     if ctx.guild.icon:
-        embed.set_author(name=f"This server's prize pool has {prize} Nicoins.", icon_url=ctx.guild.icon.url)
+        embed.set_author(name=f"這個伺服器的獎金持有 {prize} Nicoin", icon_url=ctx.guild.icon.url)
     else:
-        embed.set_author(name=f"This server's prize pool has {prize} Nicoins.")
+        embed.set_author(name=f"這個伺服器的獎金持有 {prize} Nicoin")
     await send_message(ctx, embed=embed)
 
 async def rank(ctx: Optional[Union[Context, ApplicationContext]], scope: str):
     embed = discord.Embed()
     embed.colour = discord.Colour.gold()
 
-    if scope == "This server":
+    if scope == "這個伺服器":
         ids = [str(member.id) for member in ctx.guild.members]
         query_str = "','".join(ids)
         rank = await get_rank(ctx, query_str)
         if ctx.guild.icon:
-            embed.set_author(name="Server's Leader Board", icon_url=ctx.guild.icon.url)
+            embed.set_author(name="伺服器排行榜", icon_url=ctx.guild.icon.url)
         else:
-            embed.set_author(name="Server's Leader Board")
+            embed.set_author(name="伺服器排行榜")
         
     else:
         rank = await get_rank(ctx)
-        embed.set_author(name="Global Leader Board")
+        embed.set_author(name="全伺服器排行榜")
 
     for i, r in enumerate(rank):
         if i == 0:

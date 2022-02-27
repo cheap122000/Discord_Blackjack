@@ -38,7 +38,7 @@ async def on_ready():
 async def c_help(ctx: Context):
     await tools.send_message(ctx, embed=hpc.set_help_center(message=ctx))
 
-@bot.slash_command(name="help", description="Help Center", guild_ids=tools.guild_ids)
+@bot.slash_command(name="help", description="幫助中心", guild_ids=tools.guild_ids)
 async def c__help(ctx: ApplicationContext):
     await tools.send_message(ctx, embed=hpc.set_help_center(None, ctx))
 

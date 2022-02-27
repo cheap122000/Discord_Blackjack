@@ -6,6 +6,7 @@ from functions.tools import *
 from functions import profile, tools, db_game
 from typing import Optional, Union, Tuple
 from games import longman
+import time
 
 class LongMan(commands.Cog):
     def __init__(self, bot) -> None:
@@ -19,30 +20,33 @@ class LongMan(commands.Cog):
     async def c_lm_join(self, ctx: Context):
         await join(ctx)
 
-    @commands.slash_command(name="lm_start", description="Start a LongMan Game.", guild_ids=guild_ids)
+    @commands.slash_command(name="lm_start", description="在這個伺服器開始一場射龍門遊戲", guild_ids=guild_ids)
     async def s_lm_start(self, ctx: ApplicationContext):
         await start(ctx)
 
-    @commands.slash_command(name="lm_join", description="Join a LongMan Game with 100 Nicoins.", guild_ids=guild_ids)
+    @commands.slash_command(name="lm_join", description="使用 100 個 Nicoin 來加入一場射龍門遊戲", guild_ids=guild_ids)
     async def s_lm_join(self, ctx: Context):
         await join(ctx)
 
 async def start(ctx: Optional[Union[Context, ApplicationContext]]):
     if store_to_processing(ctx):
         if longman.game_records.get(str(ctx.guild.id)):
-            await send_message(ctx, "A server can only create a LongMan game in the same time, please wait for the last game has been finished.")
-        else:
-            embed = discord.Embed()
-            embed.type = "rich"
-            embed.set_author(name="A game is started! Use command `bj!lm_join` or `/lm_join` to join this game with 100 Nicoins.")
-            embed.set_footer(text=f"The game will start in {longman.turn_count} second(s), {longman.seats} seats left.")
+            if longman[str(ctx.guild.id)]["start_time"] - time.time() < 60:
+                await send_message(ctx, "一個伺服器同時只能有一場射龍門遊戲，請等待上一場遊戲結束")
+                delete_from_processing(ctx)
+                return
 
-            await send_message(ctx, "OK", ephemeral=True)
-            m = await create_message(ctx, embed=embed)
-            loop.create_task(longman.game_task(ctx.channel, str(ctx.guild.id), m))
+        embed = discord.Embed()
+        embed.type = "rich"
+        embed.set_author(name="遊戲開始! 使用指令 `bj!lm_join` 或 `/lm_join` 自動支付 100 Nicoin 加入這場遊戲")
+        embed.set_footer(text=f"遊戲將在 {longman.turn_count} 秒後開始，還有 {longman.seats} 個座位")
+
+        await send_message(ctx, "OK", ephemeral=True)
+        m = await create_message(ctx, embed=embed)
+        loop.create_task(longman.game_task(ctx.channel, str(ctx.guild.id), m))
         delete_from_processing(ctx)
     else:
-        await reply_message(ctx, "Error! Please wait for the last command finish.")
+        await reply_message(ctx, "錯誤！請等待前一個指令執行完畢")
 
 async def join(ctx: Optional[Union[Context, ApplicationContext]]):
     if store_to_processing(ctx):
@@ -51,7 +55,7 @@ async def join(ctx: Optional[Union[Context, ApplicationContext]]):
 
         if longman.game_records.get(guild_id):
             if longman.game_records[guild_id]["step"] != 0:
-                await reply_message(ctx, f"A game is started. Please wait for the next game.")
+                await reply_message(ctx, f"有一場射龍門遊戲已經開始了，請等待下一場")
                 delete_from_processing(ctx)
                 return
                 
@@ -61,19 +65,19 @@ async def join(ctx: Optional[Union[Context, ApplicationContext]]):
                 if success:
                     longman.game_records[guild_id]["prize"] = prize
                     delete_from_processing(ctx)
-                    await reply_message(ctx, f"You joined the game, now you left {balance} Nicoins.")
+                    await reply_message(ctx, f"你加入了一場射龍門，剩餘 {balance} :coin:")
                     db.close()
                     longman.game_records[guild_id]["players"].append({"user_id": ctx.author.id, "user_name": ctx.author.display_name, "bet_amount": 0, "bet": "", "cards": [], "revealed": False, "result": None})
                     return
                 else:
-                    await reply_message(ctx, f"You should have at least 100 :coin: to join LongMan. Your Nicoins: {balance}")
+                    await reply_message(ctx, f"你至少必須有 100 :coin: 當作入場費加入射龍門. 你的餘額： {balance} :coin:")
                     db.close()
                     delete_from_processing(ctx)
                     return
             else:
-                await reply_message(ctx, "The max limit for a game is 10 players. Please wait for the next game.")
+                await reply_message(ctx, "一場 射龍門 最多只能 10 個人遊玩，請等待下一場遊戲開始")
         else:
-            await reply_message(ctx, f"Use command `bj!lm_start` or `/lm_start` to create a game first.")
+            await reply_message(ctx, f"請先使用指令 `bj!lm_start` 或 `/lm_start` 創立一場 射龍門 遊戲")
         delete_from_processing(ctx)
     else:
-        await reply_message(ctx, "Error! Please wait for the last command finish.")
+        await reply_message(ctx, "錯誤！請等待前一個指令執行完畢")

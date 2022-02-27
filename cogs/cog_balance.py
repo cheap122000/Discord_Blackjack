@@ -11,16 +11,17 @@ class Balance(commands.Cog):
     def __init__(self, bot) -> None:
         self.bot = bot
 
-    @commands.slash_command(name="give", description="Give your Nicoins to friends(?.", guild_ids=guild_ids)
-    async def s_give(self, ctx: ApplicationContext, user: discord.Member, chips: Option(int, "How many Nicoins you want to give?", min_value=1)):
+    @commands.slash_command(name="give", description="把 Nicoins 送給你的朋友(?", guild_ids=guild_ids)
+    # @commands.slash_command(name="give", description="Give your Nicoins to friends(?.", guild_ids=[557585386612850708])
+    async def s_give(self, ctx: ApplicationContext, user: discord.Member, chips: Option(int, "你要給他多少籌碼呢?", min_value=1)):
         success, balance_author, balance_user = give_chips(ctx, user, chips)
         if success:
             embed = discord.Embed()
             embed.colour = discord.Colour.green()
-            embed.set_author(name=f"{ctx.author.display_name} give {chips} Nicoins to {user.display_name}", icon_url=ctx.author.display_avatar)
-            embed.add_field(name=f"{ctx.author.display_name}#{ctx.author.discriminator}", value=f"now have {balance_author} :coin:", inline=False)
-            embed.add_field(name=f"{user.display_name}#{user.discriminator}", value=f"now have {balance_user} :coin:", inline=False)
-            await send_message(ctx, f"<@!{ctx.author.id}> give {chips} Nicoins to <@!{user.id}>", embed=embed)
+            embed.set_author(name=f"{ctx.author.display_name} 把 {chips} Nicoins 拿給 {user.display_name}", icon_url=ctx.author.display_avatar)
+            embed.add_field(name=f"{ctx.author.display_name}#{ctx.author.discriminator}", value=f"現在有 {balance_author} :coin:", inline=False)
+            embed.add_field(name=f"{user.display_name}#{user.discriminator}", value=f"現在有 {balance_user} :coin:", inline=False)
+            await send_message(ctx, f"<@!{ctx.author.id}> 把 {chips} Nicoins 拿給 <@!{user.id}>", embed=embed)
         else:
             await send_message(ctx, "You don't have enough chips", ephemeral=True)
 
