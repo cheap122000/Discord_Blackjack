@@ -126,7 +126,7 @@ async def rank(ctx: Optional[Union[Context, ApplicationContext]], scope: str):
         elif i == 9:
             embed.add_field(name=f":keycap_ten: {r['user_name']}", value=f"{r['balance']} :coin:", inline=False)
 
-    embed.set_footer(text=f"Created at {datetime.now().strftime('%Y/%m/%d %H:%M:%S')}")
+    embed.set_footer(text=f"產生於 {datetime.now().strftime('%Y/%m/%d %H:%M:%S')}")
     await send_message(ctx, embed=embed)
 
 async def get_rank(ctx: Optional[Union[Context, ApplicationContext]], query_str: str=None) -> list:
