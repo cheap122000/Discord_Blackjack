@@ -42,19 +42,19 @@ async def gamble(ctx: Optional[Union[Context, ApplicationContext]], bet_amount):
             if num <= 60:
                 prize = db.add_to_pool(ctx.guild.id, bet_amount)
                 embed.colour = discord.Colour.red()
-                embed.set_author(name=f"{ctx.author.display_name} 拿到 {num}, 輸了 {bet_amount} Nicoin， 剩餘 {balance} Nicoin", icon_url=ctx.author.display_avatar)
+                embed.set_author(name=f"{ctx.author.display_name} 拿到了 {num}, 輸了 {bet_amount} Nicoin， 剩餘 {balance} Nicoin", icon_url=ctx.author.display_avatar)
                 if ctx.guild.icon:
-                    embed.set_footer(text=f"這個伺服器的獎金池現在有 {prize} Nicoin.", icon_url=ctx.guild.icon.url)
+                    embed.set_footer(text=f"{ctx.guild.name} 的獎金池現在有 {prize} Nicoin.", icon_url=ctx.guild.icon.url)
                 else:
-                    embed.set_footer(text=f"這個伺服器的獎金池現在有 {prize} Nicoin.")
+                    embed.set_footer(text=f"{ctx.guild.name} 的獎金池現在有 {prize} Nicoin.")
             elif num <= 97:
                 balance = db.get_balance(ctx.author.id, bet_amount*2)
                 embed.colour = discord.Colour.green()
-                embed.set_author(name=f"{ctx.author.display_name} 拿到 {num}, 贏了 {bet_amount} Nicoin. 現在有 {balance} Nicoin", icon_url=ctx.author.display_avatar)
+                embed.set_author(name=f"{ctx.author.display_name} 拿到了 {num}, 贏了 {bet_amount} Nicoin. 現在有 {balance} Nicoin", icon_url=ctx.author.display_avatar)
             else:
                 balance = db.get_balance(ctx.author.id, bet_amount*3)
                 embed.colour = discord.Colour.gold()
-                embed.set_author(name=f"{ctx.author.display_name} 拿到 {num}, 贏了 {bet_amount*2} Nicoin. 現在有 {balance} Nicoin", icon_url=ctx.author.display_avatar)
+                embed.set_author(name=f"{ctx.author.display_name} 拿到了 {num}, 贏了 {bet_amount*2} Nicoin. 現在有 {balance} Nicoin", icon_url=ctx.author.display_avatar)
             await reply_message(ctx, embed=embed)
         else:
             await reply_message(ctx, content=f"你沒有足夠的籌碼. 你的餘額: {balance} :coin:")
