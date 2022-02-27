@@ -82,9 +82,9 @@ async def get_guild_pool(ctx: Optional[Union[Context, ApplicationContext]]):
     embed = discord.Embed()
     embed.colour = discord.Colour.green()
     if ctx.guild.icon:
-        embed.set_author(name=f"這個伺服器的獎金持有 {prize} Nicoin", icon_url=ctx.guild.icon.url)
+        embed.set_author(name=f"這個伺服器的獎金池有 {prize} Nicoin", icon_url=ctx.guild.icon.url)
     else:
-        embed.set_author(name=f"這個伺服器的獎金持有 {prize} Nicoin")
+        embed.set_author(name=f"這個伺服器的獎金池有 {prize} Nicoin")
     await send_message(ctx, embed=embed)
 
 async def rank(ctx: Optional[Union[Context, ApplicationContext]], scope: str):
