@@ -10,7 +10,6 @@ import asyncio
 import os, shutil
 from games.game_config import *
 from functions import help_center, tools
-import longman
 from cogs import cog_profile, cog_blackjack, cog_gamble, cog_balance, cog_longman
 
 token = tools.token
