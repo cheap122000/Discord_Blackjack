@@ -101,9 +101,9 @@ class LM_View(View):
                 cards, points = show_cards(game_records[guild_id]["players"][turn], force_show=True)
                 if len(game_records[guild_id]['players'][turn]["cards"]) < 3:
                     if deck_of_card[game_records[guild_id]['players'][turn]["cards"][0]]["r_number"] != deck_of_card[game_records[guild_id]['players'][turn]["cards"][1]]["r_number"]:
-                        await interaction.response.send_message(f"你的牌是 {cards}.\n你想做什麼？", ephemeral=True, view=LM_Card_In_View())
+                        await interaction.response.send_message(f"你的牌是 {cards}.\n你的決定是什麼？", ephemeral=True, view=LM_Card_In_View())
                     else:
-                        await interaction.response.send_message(f"你的牌是 {cards}.\n你想做什麼？", ephemeral=True, view=LM_Card_UD_View())
+                        await interaction.response.send_message(f"你的牌是 {cards}.\n你的決定是什麼？", ephemeral=True, view=LM_Card_UD_View())
                 else:
                     await interaction.response.send_message("不允許的指令", delete_after=1, ephemeral=True)
         else:
@@ -312,9 +312,9 @@ async def step2(record):
         # record["message2"] = await record["message"].channel.send(f"It's <@!{record['players'][i]['user_id']}>'s turn.", view=LM_View())
         cards, points = show_cards(p, force_show=True)
         if deck_of_card[p["cards"][0]]["r_number"] != deck_of_card[p["cards"][1]]["r_number"]:
-            record["message2"] = await record["message"].channel.send(f"<@!{p['user_id']}> 的牌是 {cards}.\n你想做什麼？", view=LM_Card_In_View())
+            record["message2"] = await record["message"].channel.send(f"<@!{p['user_id']}> 的牌是 {cards}.\n你的決定是什麼？", view=LM_Card_In_View())
         else:
-            record["message2"] = await record["message"].channel.send(f"<@!{p['user_id']}> 的牌是 {cards}.\n你想做什麼？", view=LM_Card_UD_View())
+            record["message2"] = await record["message"].channel.send(f"<@!{p['user_id']}> 的牌是 {cards}.\n你的決定是什麼？", view=LM_Card_UD_View())
 
         record['start_time'] = int(time.time())
         while True:
@@ -328,7 +328,7 @@ async def step2(record):
                 msg = f"<@!{record['players'][i]['user_id']}> 的回合\n你剩下 {time_left} 秒"
 
             await record["message"].edit(content=msg)   
-            await record["message2"].edit(content=f"<@!{p['user_id']}> 的牌是 {cards}.\n你想做什麼\n剩餘 {time_left} 秒")         
+            await record["message2"].edit(content=f"<@!{p['user_id']}> 的牌是 {cards}.\n你的決定是什麼？\n剩餘 {time_left} 秒")         
                 
             bet_str = f"({record['players'][i]['bet'].upper()})" if record['players'][i]['bet'] != "" else ""
             record["message"].embeds[0].set_field_at(i+1, name=f":point_right: {record['players'][i]['user_name']}", value=f"籌碼: {record['players'][i]['bet_amount']} :coin: {bet_str}\n手牌: {cards}", inline=False)
@@ -390,15 +390,15 @@ def show_cards(player, force_show=False):
                     if cards_rnum[0] != cards_rnum[1]:
                         if cards_rnum[0] == cards_rnum[2] or cards_rnum[1] == cards_rnum[2]:
                             result = 2
-                            now_cards += "\n結果: 撞柱 "
+                            now_cards += "\n結果: 撞柱，"
                             now_cards += f" 輸了 {player['bet_amount']*2} :coin:"
                         elif cards_rnum[0] > cards_rnum[2] > cards_rnum[1] or cards_rnum[0] < cards_rnum[2] < cards_rnum[1]:
                             result = 0
-                            now_cards += "\n結果: 進球 "
+                            now_cards += "\n結果: 進球，"
                             now_cards += f" 贏了 {player['bet_amount']} :coin:"
                         else:
                             result = 1
-                            now_cards += "\n結果: 沒進 "
+                            now_cards += "\n結果: 沒進，"
                             now_cards += f" 輸了 {player['bet_amount']} :coin:"
                     else:
                         if cards_rnum[0] == cards_rnum[2]:
@@ -407,14 +407,14 @@ def show_cards(player, force_show=False):
                             now_cards += f" 輸了 {player['bet_amount']*3} :coin:"
                         elif cards_rnum[2] > cards_rnum[0]:
                             result = 1.2
-                            now_cards += "\nresult: 大 "
+                            now_cards += "\n結果: 大，"
                             if player["bet"] == "big":
                                 now_cards += f" 贏了 {player['bet_amount']} :coin:"
                             else:
                                 now_cards += f" 輸了 {player['bet_amount']} :coin:"
                         else:
                             result = 1.1
-                            now_cards += "\nresult: 小 "
+                            now_cards += "\n結果: 小，"
                             if player["bet"] == "small":
                                 now_cards += f" 贏了 {player['bet_amount']} :coin:"
                             else:
