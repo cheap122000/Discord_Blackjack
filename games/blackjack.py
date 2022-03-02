@@ -127,10 +127,10 @@ async def step(record):
 
     dealer_cards, dealer_points = show_cards(record["dealer"]["cards"])
 
-    embed.add_field(name="Dealer", value=f"cards: {dealer_cards}", inline=False)
+    embed.add_field(name="莊家", value=f"手牌: {dealer_cards}", inline=False)
 
     for item in record["players"]:
-        embed.add_field(name=item["user_name"], value=f"chips: {item['bet_amount']} :coin:\ncards: ", inline=False)
+        embed.add_field(name=item["user_name"], value=f"籌碼: {item['bet_amount']} :coin:\n手牌: ", inline=False)
 
     if time_left <= 0:
         record["step"] += 1
