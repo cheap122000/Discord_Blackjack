@@ -357,7 +357,7 @@ async def step4(record):
             temp[id]["user_name"] = p["user_name"]
 
 
-        embed.set_field_at(i+1, name=p["user_name"], value=f"chips: {record['players'][i]['bet_amount']} :coin:\n手牌: {cards}\n結果: {result}\n金額: {balance - p['bet_amount']} :coin:", inline=False)
+        embed.set_field_at(i+1, name=p["user_name"], value=f"籌碼: {record['players'][i]['bet_amount']} :coin:\n手牌: {cards}\n結果: {result}\n金額: {balance - p['bet_amount']} :coin:", inline=False)
 
     # await record["message"].edit(embed=embed, content="Result")
     all_balance = ""
