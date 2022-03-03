@@ -41,7 +41,7 @@ class BJGame(commands.Cog):
 async def start(ctx: Optional[Union[Context, ApplicationContext]]):
     if store_to_processing(ctx):
         if blackjack.game_records.get(str(ctx.channel.id)):
-            if blackjack[str(ctx.channel.id)]["start_time"] - time.time() < 60:
+            if blackjack.game_records[str(ctx.channel.id)]["start_time"] - time.time() < 60:
                 await send_message(ctx, "頻道內已經開始了一場遊戲，請等待下一場遊戲")
                 delete_from_processing(ctx)
                 return

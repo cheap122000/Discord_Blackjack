@@ -31,7 +31,7 @@ class LongMan(commands.Cog):
 async def start(ctx: Optional[Union[Context, ApplicationContext]]):
     if store_to_processing(ctx):
         if longman.game_records.get(str(ctx.guild.id)):
-            if longman[str(ctx.guild.id)]["start_time"] - time.time() < 60:
+            if longman.game_records[str(ctx.guild.id)]["start_time"] - time.time() < 60:
                 await send_message(ctx, "一個伺服器同時只能有一場射龍門遊戲，請等待上一場遊戲結束")
                 delete_from_processing(ctx)
                 return
