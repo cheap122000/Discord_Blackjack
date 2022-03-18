@@ -303,7 +303,10 @@ async def step2(record):
         record['turn'] = i
         cards, result = show_cards(p)
 
-        record["message"].embeds[0].set_field_at(i+1, name=f":point_right: {record['players'][i]['user_name']}", value=f"籌碼: {record['players'][i]['bet_amount']} :coin:\n手牌: {cards}", inline=False)
+        try:
+            record["message"].embeds[0].set_field_at(i+1, name=f":point_right: {record['players'][i]['user_name']}", value=f"籌碼: {record['players'][i]['bet_amount']} :coin:\n手牌: {cards}", inline=False)
+        except:
+            break
         await record["message"].edit(embed=record["message"].embeds[0], content=f"{p['user_name']}'s turn.")
 
         if record.get("message2"):
