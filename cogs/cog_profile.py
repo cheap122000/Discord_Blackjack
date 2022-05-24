@@ -40,7 +40,7 @@ class Profile(commands.Cog):
                     await ctx.send("你才不是 CodingMaster 呢 = =")
                     tools.delete_from_processing(ctx)
                     return
-                dc_id = m_s[1].replace("<@!", "").replace(">", "")
+                dc_id = m_s[1].replace("<@!", "").replace(">", "").replace("<@", "")
                 give_amount = int(m_s[2])
             except:
                 await ctx.send("Your bet amount must be a positive number")
