@@ -1,0 +1,1 @@
+"C:\Users\TaaD618\anaconda3\envs\dc_blackjack\python.exe" "casino.py"
